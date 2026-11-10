@@ -10,6 +10,6 @@
  * os dados ficam apenas no navegador de quem está testando.
  */
 window.SP_CONFIG = {
-    SUPABASE_URL: '',
-    SUPABASE_ANON_KEY: '',
+    SUPABASE_URL: 'sb_publishable_4nqe64pA6AFmKpF7c005eg_JEF2Knrr',
+    SUPABASE_ANON_KEY: 'https://bnalsxgaqxfkwbilpbsq.supabase.co',
 };
