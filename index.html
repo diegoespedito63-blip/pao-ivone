@@ -16,11 +16,11 @@
     <link rel="preload" as="image" href="https://images.unsplash.com/photo-1608198093002-ad4e005484ec?auto=format&fit=crop&w=828&h=360&q=60" fetchpriority="high">
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,500&display=swap"></noscript>
-    <link rel="stylesheet" href="style.css">
-    <script src="config.js" defer></script>
-    <script src="core.js" defer></script>
-    <script src="api.js" defer></script>
-    <script src="store.js" defer></script>
+    <link rel="stylesheet" href="style.css?v=20261110c">
+    <script src="config.js?v=20261110c" defer></script>
+    <script src="core.js?v=20261110c" defer></script>
+    <script src="api.js?v=20261110c" defer></script>
+    <script src="store.js?v=20261110c" defer></script>
 </head>
 <body>
 
@@ -32,8 +32,8 @@
             <span data-s="business_name">Sabor de Pão</span>
         </span>
         <div class="top-actions">
-            <button class="top-btn" id="btnOrders" type="button">📦 <span>Meus pedidos</span></button>
-            <button class="top-btn top-btn-icon" id="btnAccount" type="button" aria-label="Meus dados">👤</button>
+            <button class="top-btn" id="btnOrders" type="button" aria-label="Meus pedidos">📦 <span>Pedidos</span></button>
+            <button class="top-btn" id="btnAccount" type="button">👤 <span id="accLabel">Cadastrar</span></button>
         </div>
     </div>
 </header>
@@ -242,13 +242,13 @@
 <!-- MODAL: MEUS DADOS -->
 <div class="overlay" id="mAccount" hidden>
     <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="accTitle">
-        <div class="sheet-head"><h2 id="accTitle">👤 Meus dados</h2><button class="x" type="button" data-close aria-label="Fechar">✕</button></div>
-        <form class="form pad" id="accountForm">
-            <p class="muted">Seus dados ficam salvos só neste celular, para preencher o próximo pedido mais rápido.</p>
-            <label>Nome<input name="name" maxlength="100" autocomplete="name"></label>
-            <label>WhatsApp<input name="phone" type="tel" inputmode="tel" autocomplete="tel"></label>
-            <button class="btn btn-primary btn-block" type="submit">Salvar</button>
-            <button class="btn btn-outline btn-block" type="button" id="accClear" style="margin-top:8px">Apagar meus dados</button>
+        <div class="sheet-head"><h2 id="accTitle">👤 Meu cadastro</h2><button class="x" type="button" data-close aria-label="Fechar">✕</button></div>
+        <form class="form pad" id="accountForm" novalidate>
+            <p class="muted">Cadastre-se para fazer seus pedidos mais rápido e receber novidades da Sabor de Pão pelo WhatsApp.</p>
+            <label>Nome *<input name="name" maxlength="100" autocomplete="name" placeholder="Seu nome"></label>
+            <label>WhatsApp *<input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(19) 99999-9999"></label>
+            <button class="btn btn-primary btn-block btn-lg" type="submit" id="accSave">Salvar cadastro</button>
+            <button class="btn btn-outline btn-block btn-sm" type="button" id="accClear" style="margin-top:8px">Sair (apagar deste celular)</button>
         </form>
     </div>
 </div>
