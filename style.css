@@ -226,7 +226,11 @@ body.has-cart .wa-float { bottom: calc(88px + env(safe-area-inset-bottom)); }
 .pix-box { margin: 14px 0; padding: 16px; border: 2px solid var(--rose); border-radius: 16px; text-align: center; }
 .pix-box h3 { font-size: 1.1rem; margin-bottom: 4px; }
 .pix-key { margin: 6px 0 10px; padding: 8px 10px; border-radius: 10px; background: var(--beige-2); font-family: ui-monospace, monospace; font-weight: 700; word-break: break-all; }
-.pix-qr { width: 190px; height: 190px; margin: 8px auto; }
+.pix-qr { display: block; width: 190px; height: 190px; margin: 8px auto 0; }
+.pix-opt { text-align: left; padding: 12px 0; border-top: 1px solid var(--line); }
+.pix-opt > b { display: block; color: var(--brown); font-size: 1rem; }
+.pix-opt > span { display: block; font-size: .88rem; color: var(--muted); margin: 2px 0 8px; }
+.pix-opt .pix-key { text-align: center; font-size: 1.15rem; }
 
 /* Informações, pedidos */
 .info-block { margin-bottom: 18px; }
