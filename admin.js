@@ -71,10 +71,11 @@
 
     // ── Abas ──────────────────────────────────────────────────
     function showTab(tab) {
-        if (!['orders', 'products', 'categories', 'settings'].includes(tab)) tab = 'orders';
+        if (!['orders', 'customers', 'products', 'categories', 'settings'].includes(tab)) tab = 'orders';
         $$('#tabs button').forEach(b => { if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
         $$('.view').forEach(v => { v.hidden = v.id !== 'v-' + tab; });
         history.replaceState(null, '', '#' + tab);
+        if (tab === 'customers') loadCustomers();
         if (tab === 'products') renderProducts();
         if (tab === 'categories') renderCategories();
         if (tab === 'settings') fillSettings();
@@ -252,6 +253,73 @@
             catch (ex) { toast(errMsg(ex), true); }
         };
     }
+
+    // ════════════════════════════════════════════════════════════
+    //  CLIENTES (cadastrados pelo site ou que já fizeram pedido)
+    // ════════════════════════════════════════════════════════════
+    let customers = [], customerFilter = 'todos';
+    async function loadCustomers() {
+        $('#customersList').innerHTML = '<p class="muted center">Carregando…</p>';
+        try { customers = await API.listCustomers(); renderCustomers(); }
+        catch (e) { $('#customersList').innerHTML = ''; toast(errMsg(e), true); }
+    }
+    function renderCustomers() {
+        const q = SP.norm($('#customerSearch').value), qd = SP.digits(q);
+        const list = customers.filter(c => (customerFilter === 'todos' || (customerFilter === 'cadastro' ? c.origin === 'cadastro' : c.orders_count > 0))
+            && (!q || SP.norm(c.name).includes(q) || (qd.length >= 3 && c.phone.includes(qd))));
+        const cad = customers.filter(c => c.origin === 'cadastro').length, buy = customers.filter(c => c.orders_count > 0).length;
+        $('#customersInfo').textContent = `${customers.length} cliente(s) no total · ${cad} cadastrado(s) pelo site · ${buy} já compraram`;
+        $('#customersList').innerHTML = list.map(c => `<div class="row-card" data-phone="${esc(c.phone)}">
+                <span class="ph cust-ini">${esc((c.name || '?').trim().charAt(0).toUpperCase())}</span>
+                <div class="row-main" data-act="open"><div class="row-title">${esc(c.name)}</div>
+                    <div class="row-sub">${esc(SP.phoneMask(c.phone))} · ${c.orders_count ? `<b>${c.orders_count}</b> pedido(s) · ${money(c.total_spent)}` : 'ainda sem pedidos'}${c.origin === 'cadastro' ? ' · 👤 cadastrado' : ''}</div></div>
+                <div class="row-actions"><a class="ibtn" href="${esc(SP.waLink(c.phone, `Olá, ${c.name.split(' ')[0]}! Aqui é da ${settings.business_name || 'Sabor de Pão'}.`))}" target="_blank" rel="noopener" aria-label="WhatsApp" title="Chamar no WhatsApp">💬</a></div>
+            </div>`).join('') || '<p class="muted center">Nenhum cliente encontrado.</p>';
+    }
+    $('#customerSearch').addEventListener('input', renderCustomers);
+    $('#customerFilters').addEventListener('click', e => {
+        const b = e.target.closest('[data-cf]'); if (!b) return; customerFilter = b.dataset.cf;
+        $$('#customerFilters .pill').forEach(p => p.setAttribute('aria-selected', String(p === b))); renderCustomers();
+    });
+    $('#customersList').addEventListener('click', e => { if (!e.target.closest('[data-act=open]')) return; openCustomer(e.target.closest('.row-card').dataset.phone); });
+    function openCustomer(phone) {
+        const c = customers.find(x => x.phone === phone); if (!c) return;
+        const hist = orders.filter(o => o.customer_phone === phone);
+        $('#customerDetail').innerHTML = `<div class="od"><h2 id="cuTitle">${esc(c.name)}</h2>
+            <div class="od-sec"><div class="kv"><span>WhatsApp</span><span>${esc(SP.phoneMask(c.phone))}</span></div>
+                <div class="kv"><span>Cliente desde</span><span>${SP.dateTimeBR(c.created_at)}</span></div>
+                <div class="kv"><span>Como chegou</span><span>${c.origin === 'cadastro' ? 'Cadastro no site' : 'Fez um pedido'}</span></div>
+                <div class="kv"><span>Pedidos</span><span>${c.orders_count}</span></div>
+                <div class="kv"><span>Total comprado</span><span>${money(c.total_spent)}</span></div>
+                ${c.last_order_at ? `<div class="kv"><span>Último pedido</span><span>${SP.dateTimeBR(c.last_order_at)}</span></div>` : ''}
+                <a class="btn btn-wa btn-block" style="margin-top:10px" href="${esc(SP.waLink(c.phone, `Olá, ${c.name.split(' ')[0]}! Aqui é da ${settings.business_name || 'Sabor de Pão'}.`))}" target="_blank" rel="noopener">💬 Chamar no WhatsApp</a></div>
+            <form class="form od-sec" id="custNotesForm"><label>Anotações sobre o cliente<textarea name="notes" rows="2" maxlength="500" placeholder="Ex.: prefere pão bem assado">${esc(c.notes || '')}</textarea></label><button class="btn btn-brown btn-sm" type="submit">Salvar anotação</button></form>
+            ${hist.length ? `<div class="od-sec"><h3>Pedidos</h3>${hist.map(o => `<div class="kv"><span>${esc(o.code)} · ${SP.dateTimeBR(o.created_at)}<br><small>${esc((SP.STATUS[o.status] || {}).label || o.status)}</small></span><span>${o.total != null ? money(o.total) : '—'}</span></div>`).join('')}</div>` : ''}
+            <button class="btn btn-outline btn-block btn-sm" type="button" id="custDelete" style="color:var(--danger);border-color:var(--danger)">Excluir cadastro</button></div>`;
+        openM('mCustomer');
+        $('#custNotesForm').onsubmit = async e => {
+            e.preventDefault();
+            try { await API.saveCustomerNotes(c.phone, e.target.notes.value.trim()); c.notes = e.target.notes.value.trim(); toast('Anotação salva!'); }
+            catch (ex) { toast(errMsg(ex), true); }
+        };
+        $('#custDelete').onclick = async () => {
+            if (!confirm(`Excluir o cadastro de ${c.name}? Os pedidos dele continuam guardados.`)) return;
+            try { await API.deleteCustomer(c.phone); customers = customers.filter(x => x !== c); closeM('mCustomer'); renderCustomers(); toast('Cadastro excluído.'); }
+            catch (ex) { toast(errMsg(ex), true); }
+        };
+    }
+    // Baixa a lista em planilha (abre no Excel / Google Planilhas)
+    $('#exportCustomers').onclick = () => {
+        if (!customers.length) { toast('Ainda não há clientes.', true); return; }
+        const cell = v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
+        const rows = [['Nome', 'WhatsApp', 'Origem', 'Pedidos', 'Total comprado (R$)', 'Último pedido', 'Cliente desde', 'Anotações']]
+            .concat(customers.map(c => [c.name, SP.phoneMask(c.phone), c.origin === 'cadastro' ? 'Cadastro no site' : 'Pedido', c.orders_count,
+                Number(c.total_spent || 0).toFixed(2).replace('.', ','), c.last_order_at ? SP.dateTimeBR(c.last_order_at) : '', SP.dateTimeBR(c.created_at), c.notes || '']));
+        const csv = '﻿' + rows.map(r => r.map(cell).join(';')).join('\r\n');
+        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+        a.download = `clientes-sabor-de-pao-${new Date().toISOString().slice(0, 10)}.csv`; document.body.appendChild(a); a.click(); a.remove();
+        toast('Lista de clientes baixada!');
+    };
 
     // ════════════════════════════════════════════════════════════
     //  PRODUTOS
@@ -526,6 +594,7 @@
             try {
                 const data = Object.assign({}, settings);
                 TEXT_FIELDS.forEach(k => { data[k] = sf[k].value.trim(); });
+                data.pix_key = SP.pixKey(data.pix_key);          // celular vira +55..., como o PIX exige
                 const wa = SP.digits(sf.whatsapp.value);
                 if (wa && (wa.length < 10 || wa.length > 13)) { sf.whatsapp.classList.add('invalid'); throw new Error('WhatsApp inválido. Use DDD + número.'); }
                 data.whatsapp = wa;
