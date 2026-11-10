@@ -91,7 +91,7 @@
         pickup_enabled: true,
         pickup_info: '',
         orders_info: '',
-        pix_key: '',                 // a proprietária cadastra no painel
+        pix_key: '+5511943093536',   // chave PIX (celular) informada pela proprietária
         pix_holder: 'IVANE VOLPONI DA CUNHA',
         pix_city: '',
         hero_title: 'Um sabor especial em cada pedaço!',
