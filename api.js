@@ -24,13 +24,22 @@
     async function rpc(fn, body, token) {
         const ctrl = new AbortController(); const to = setTimeout(() => ctrl.abort(), 15000);
         try {
-            const r = await fetch(`${BASE}/rest/v1/rpc/${fn}`, {
-                method: 'POST', signal: ctrl.signal,
-                headers: { apikey: cfg.SUPABASE_ANON_KEY, Authorization: `Bearer ${token || cfg.SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(body || {}),
-            });
+            // Chave antiga (anon, começa com "eyJ") vai também no Authorization.
+            // Chave nova do Supabase (sb_publishable_...) vai só no apikey — no Authorization ela é recusada.
+            const headers = { apikey: cfg.SUPABASE_ANON_KEY, 'Content-Type': 'application/json' };
+            const bearer = token || (String(cfg.SUPABASE_ANON_KEY).startsWith('eyJ') ? cfg.SUPABASE_ANON_KEY : '');
+            if (bearer) headers.Authorization = `Bearer ${bearer}`;
+            let r;
+            try { r = await fetch(`${BASE}/rest/v1/rpc/${fn}`, { method: 'POST', signal: ctrl.signal, headers, body: JSON.stringify(body || {}) }); }
+            catch (e) { const er = new Error(`Sem resposta do Supabase (${BASE || 'URL vazia'}). Confira a internet e o SUPABASE_URL no config.js.`); er.diag = true; throw er; }
             const txt = await r.text(); let data = null; try { data = txt ? JSON.parse(txt) : null; } catch (_) { }
-            if (!r.ok) { const e = new Error((data && (data.message || data.hint)) || `HTTP ${r.status}`); e.detail = data && data.details; throw e; }
+            if (!r.ok) {
+                const msg = (data && (data.message || data.hint)) || `HTTP ${r.status}`;
+                const e = new Error(msg); e.detail = data && data.details; e.status = r.status;
+                if (r.status === 401 || /api key|apikey|JWT/i.test(msg)) e.diag = `Chave do Supabase recusada (${r.status}). Confira o SUPABASE_ANON_KEY no config.js.`;
+                else if (r.status === 404 || /Could not find the function/i.test(msg)) e.diag = `O banco ainda não foi preparado: rode o schema.sql e o seed.sql no SQL Editor do Supabase. (${msg})`;
+                throw e;
+            }
             return data;
         } finally { clearTimeout(to); }
     }
@@ -48,6 +57,10 @@
         getCatalog: () => rpc('get_catalog'),
         createOrder: p => rpc('create_order', { p }),
         trackOrders: refs => rpc('track_orders', { refs }),
+        registerCustomer: p => rpc('register_customer', { p }),
+        async listCustomers() { const c = await client(); return chk(await c.rpc('admin_list_customers')) || []; },
+        async saveCustomerNotes(phone, notes) { const c = await client(); chk(await c.from('customers').update({ notes }).eq('phone', phone)); },
+        async deleteCustomer(phone) { const c = await client(); chk(await c.from('customers').delete().eq('phone', phone)); },
 
         async signIn(email, password) {
             const c = await client();
@@ -106,10 +119,13 @@
     const clone = o => JSON.parse(JSON.stringify(o));
     async function dload() {
         let db = null; try { db = JSON.parse(localStorage.getItem(DKEY) || 'null'); } catch (_) { }
-        if (db) return db;
-        if (!window.SP_SEED) await loadScript('seed.js');
+        if (db) { db.customers = db.customers || []; return db; }
+        if (!window.SP_SEED) {
+            try { await loadScript('seed.js?v=20261110c'); }
+            catch (e) { const er = new Error('Modo demonstração: o arquivo seed.js não foi encontrado. Ele precisa estar na mesma pasta do index.html.'); er.diag = er.message; throw er; }
+        }
         const S = window.SP_SEED; const cats = {};
-        db = { version: 1, seq: 1001, admin_pass: '1234', orders: [], settings: clone(S.settings), categories: [], products: [] };
+        db = { version: 1, seq: 1001, admin_pass: '1234', orders: [], customers: [], settings: clone(S.settings), categories: [], products: [] };
         S.categories.forEach(c => { const id = SP.uuid(); cats[c.slug] = id; db.categories.push({ id, slug: c.slug, name: c.name, description: c.description, image_url: c.image_url, sort_order: c.sort_order, active: true, created_at: now(), updated_at: now() }); });
         S.products.forEach(p => { const r = clone(p); r.id = SP.uuid(); r.category_id = cats[p.category]; delete r.category; r.thumb_url = ''; r.created_at = r.updated_at = now(); db.products.push(r); });
         dsave(db); return db;
@@ -136,6 +152,11 @@
         return { version: db.version, settings: clone(db.settings), categories: cats.map(c => clone(c)), products: prods, best_sellers: best };
     }
 
+    function demoUpsertCustomer(db, phone, name, origin) {
+        const c = db.customers.find(x => x.phone === phone);
+        if (c) { c.name = name; c.updated_at = now(); }
+        else db.customers.push({ phone, name, origin, notes: '', created_at: now(), updated_at: now() });
+    }
     function demoCreateOrder(db, p) {
         const ex = db.orders.find(o => o.client_ref === p.client_ref);
         if (ex) return { ...clone(ex), duplicate: true };
@@ -155,6 +176,7 @@
                 items: [{ product_id: prod.id, name: prod.name, variant_id: null, variant_name: null, weight_label: prod.weight_label, addons: [], qty, unit_price: null, total: null,
                     custom: { filling: String(c.filling).trim().slice(0, 300), ingredients: String(c.ingredients || '').trim().slice(0, 500), notes: String(c.notes || '').trim().slice(0, 500) } }],
                 subtotal: null, delivery_fee: null, delivery_pending: false, total: null, status_history: [{ status: 'aguardando_orcamento', at: now() }] };
+            demoUpsertCustomer(db, phone, name, 'pedido');
             db.orders.unshift(o); dsave(db); return clone(o);
         }
 
@@ -186,6 +208,7 @@
         const o = { ...base, kind: 'normal', status: 'pendente', fulfillment: p.fulfillment, address, payment_method: p.payment_method,
             change_for: p.payment_method === 'dinheiro' ? String(p.change_for || '').slice(0, 30) : '', items, subtotal, delivery_fee: fee,
             delivery_pending: fee === null, total, status_history: [{ status: 'pendente', at: now() }] };
+        demoUpsertCustomer(db, phone, name, 'pedido');
         db.orders.unshift(o); dsave(db); return clone(o);
     }
 
@@ -199,6 +222,21 @@
                 total: o.total, subtotal: o.subtotal, delivery_fee: o.delivery_fee, delivery_pending: o.delivery_pending, created_at: o.created_at, updated_at: o.updated_at,
                 items: o.items.map(i => ({ name: i.name, variant_name: i.variant_name, qty: i.qty, unit_price: i.unit_price, total: i.total })) }));
         },
+        async registerCustomer(p) {
+            const db = await dload(), name = String(p.name || '').trim(), phone = SP.digits(p.phone);
+            if (name.length < 2 || name.length > 100 || phone.length < 10 || phone.length > 13) fail('INVALID_CUSTOMER');
+            demoUpsertCustomer(db, phone, name, 'cadastro'); dsave(db); return delay({ ok: true, name, phone });
+        },
+        async listCustomers() {
+            needAdmin(); const db = await dload();
+            return db.customers.map(c => {
+                const os = db.orders.filter(o => o.customer_phone === c.phone && o.status !== 'cancelado');
+                const last = os.map(o => o.created_at).sort().pop() || null;
+                return { ...clone(c), orders_count: os.length, total_spent: SP.round2(os.reduce((t, o) => t + (o.total || 0), 0)), last_order_at: last };
+            }).sort((a, b) => String(b.last_order_at || b.created_at).localeCompare(String(a.last_order_at || a.created_at)));
+        },
+        async saveCustomerNotes(phone, notes) { needAdmin(); const db = await dload(); const c = db.customers.find(x => x.phone === phone); if (c) { c.notes = String(notes || '').slice(0, 500); dsave(db); } },
+        async deleteCustomer(phone) { needAdmin(); const db = await dload(); db.customers = db.customers.filter(x => x.phone !== phone); dsave(db); },
         async signIn(_email, password) {
             const db = await dload();
             if (password !== db.admin_pass) throw new Error('Senha incorreta.');
