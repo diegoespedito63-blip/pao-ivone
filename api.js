@@ -127,7 +127,7 @@
         let db = null; try { db = JSON.parse(localStorage.getItem(DKEY) || 'null'); } catch (_) { }
         if (db) { db.customers = db.customers || []; return db; }
         if (!window.SP_SEED) {
-            try { await loadScript('seed.js?v=20261110d'); }
+            try { await loadScript('seed.js?v=20261110e'); }
             catch (e) { const er = new Error('Modo demonstração: o arquivo seed.js não foi encontrado. Ele precisa estar na mesma pasta do index.html.'); er.diag = er.message; throw er; }
         }
         const S = window.SP_SEED; const cats = {};
