@@ -55,7 +55,8 @@
         } catch (e) {
             console.warn('Cardápio indisponível:', e);
             if (!catalog) {
-                $('#menu').innerHTML = `<div class="empty"><p>😕</p><p>Não foi possível carregar o cardápio.</p><button class="btn btn-primary btn-sm" type="button" id="retryLoad">Tentar novamente</button></div>`;
+                const why = e.diag && e.diag !== true ? e.diag : e.message;
+                $('#menu').innerHTML = `<div class="empty"><p>😕</p><p>Não foi possível carregar o cardápio.</p><button class="btn btn-primary btn-sm" type="button" id="retryLoad">Tentar novamente</button><p class="tiny muted" style="margin-top:14px">Motivo: ${esc(why || 'desconhecido')}</p></div>`;
                 $('#retryLoad').onclick = () => loadCatalog(true);
             }
         }
@@ -369,7 +370,7 @@
         const btn = $('#coSubmit'); submitting = true; btn.disabled = true; btn.textContent = 'Enviando…';
         try {
             const order = await API.createOrder(payload);
-            LS.set(K.profile, Object.assign(LS.get(K.profile, {}), { name: payload.customer.name, phone: payload.customer.phone }));
+            LS.set(K.profile, Object.assign(LS.get(K.profile, {}), { name: payload.customer.name, phone: payload.customer.phone })); updateAccLabel();
             const mine = LS.get(K.orders, []); if (!mine.some(o => o.ref === order.client_ref)) mine.unshift({ ref: order.client_ref, code: order.code, at: order.created_at }); LS.set(K.orders, mine.slice(0, 30));
             cart = []; cartMeta.notes = ''; saveCart(); updateCart();
             checkoutRef = null; form.notes.value = ''; form.date.value = ''; form.change.value = '';
@@ -386,7 +387,7 @@
         let pix = '';
         if (o.payment_method === 'pix') {
             pix = s.pix_key
-                ? `<div class="pix-box"><h3>📲 Pague via PIX</h3><p class="tiny muted">Titular: <b>${esc(s.pix_holder || '')}</b></p>${s.pix_city ? '<canvas class="pix-qr" id="pixQr" width="190" height="190"></canvas>' : ''}<div class="pix-key">${esc(s.pix_key)}</div><button class="btn btn-outline btn-sm" type="button" id="copyPix">📋 Copiar chave PIX</button><p style="margin:10px 0 0">Valor: <b>${money(o.total)}</b></p><p class="tiny muted" style="margin:4px 0 0">Depois de pagar, envie o comprovante no WhatsApp.</p></div>`
+                ? `<div class="pix-box"><h3>📲 Pague via PIX</h3><p class="tiny muted">Titular: <b>${esc(s.pix_holder || '')}</b></p><canvas class="pix-qr" id="pixQr" width="190" height="190" aria-label="QR Code PIX"></canvas><p class="tiny muted" style="margin:0">Chave PIX:</p><div class="pix-key">${esc(SP.pixKeyLabel(s.pix_key))}</div><button class="btn btn-outline btn-sm" type="button" id="copyPix">📋 Copiar chave</button> <button class="btn btn-outline btn-sm" type="button" id="copyPixCode">📋 PIX copia e cola</button><p style="margin:10px 0 0">Valor: <b>${money(o.total)}</b></p><p class="tiny muted" style="margin:4px 0 0">Depois de pagar, envie o comprovante no WhatsApp.</p></div>`
                 : `<div class="pix-box"><h3>📲 Pagamento via PIX</h3><p>Titular: <b>${esc(s.pix_holder || '')}</b></p><p class="tiny muted">Enviaremos a chave PIX pelo WhatsApp.</p></div>`;
         }
         $('#doneBody').innerHTML = `<div class="done-check">✓</div><h2 id="doneTitle">Pedido registrado!</h2>
@@ -401,8 +402,13 @@
                 <div class="li"><span>Pagamento</span><span>${esc(SP.PAY_LABEL[o.payment_method] || '')}</span></div></div>
             <button class="btn btn-outline btn-block" type="button" data-close>Voltar ao cardápio</button>`;
         openM('mDone');
-        if (o.payment_method === 'pix' && s.pix_key && s.pix_city) drawQR(SP.pixPayload(s.pix_key, s.pix_holder, s.pix_city, o.delivery_pending ? 0 : o.total));
-        if ($('#copyPix')) $('#copyPix').onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(s.pix_key) : Promise.reject()).then(() => toast('Chave PIX copiada!')).catch(() => prompt('Copie a chave:', s.pix_key));
+        if (o.payment_method === 'pix' && s.pix_key) {
+            const code = SP.pixPayload(s.pix_key, s.pix_holder, s.pix_city, o.delivery_pending ? 0 : o.total), key = SP.pixKey(s.pix_key);
+            drawQR(code);
+            const copy = (t, ok) => (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast(ok)).catch(() => prompt('Copie:', t));
+            $('#copyPix').onclick = () => copy(key, 'Chave PIX copiada!');
+            $('#copyPixCode').onclick = () => copy(code, 'PIX copia e cola copiado! Cole no app do banco.');
+        }
     }
     function drawQR(text) {
         const draw = () => {
@@ -476,10 +482,20 @@
             }).join('') || '<p class="muted">Nenhum pedido encontrado.</p>';
         } catch (e) { body.innerHTML = '<p class="muted">Não foi possível consultar agora. Tente de novo em instantes.</p>'; }
     };
+    function updateAccLabel() { const pr = LS.get(K.profile, {}); $('#accLabel').textContent = pr.name ? pr.name.split(' ')[0] : 'Cadastrar'; }
     $('#btnAccount').onclick = () => { const f = $('#accountForm'), pr = LS.get(K.profile, {}); f.name.value = pr.name || ''; f.phone.value = pr.phone ? SP.phoneMask(pr.phone) : ''; openM('mAccount'); };
     $('#accountForm').phone.addEventListener('input', e => { e.target.value = SP.phoneMask(e.target.value); });
-    $('#accountForm').addEventListener('submit', e => { e.preventDefault(); LS.set(K.profile, { name: e.target.name.value.trim(), phone: SP.digits(e.target.phone.value) }); closeM('mAccount'); toast('Dados salvos!'); });
-    $('#accClear').onclick = () => { LS.del(K.profile); $('#accountForm').reset(); toast('Dados apagados deste celular.'); };
+    $('#accountForm').addEventListener('submit', async e => {
+        e.preventDefault(); const f = e.target;
+        const bad = validate(f, ['name', 'phone']); if (bad) { toast('Preencha seu nome e WhatsApp.', true); bad.focus(); return; }
+        const btn = $('#accSave'); if (btn.disabled) return; btn.disabled = true; btn.textContent = 'Salvando…';
+        const data = { name: f.name.value.trim(), phone: SP.digits(f.phone.value) };
+        try { await API.registerCustomer(data); LS.set(K.profile, data); updateAccLabel(); closeM('mAccount'); toast(`Cadastro feito! Bem-vindo(a), ${data.name.split(' ')[0]}! 🥖`); }
+        catch (ex) { toast(SP.errorText(ex), true); }
+        finally { btn.disabled = false; btn.textContent = 'Salvar cadastro'; }
+    });
+    $('#accClear').onclick = () => { LS.del(K.profile); $('#accountForm').reset(); updateAccLabel(); closeM('mAccount'); toast('Você saiu. Seus dados foram apagados deste celular.'); };
+    updateAccLabel();
 
     // Acesso ao painel: 5 toques no nome da loja (igual ao sistema anterior)
     let taps = 0, tapT;
