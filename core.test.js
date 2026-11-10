@@ -37,7 +37,13 @@ console.log('\nCardápio oficial (carga inicial)');
 const off = { 'Pão Tradicional': 17, 'Pão de Leite': 19, 'Pão de Cebola': 18, 'Pão de Milho': 19, 'Pão Integral': 19, 'Pão Recheado de Frango com Requeijão': 29, 'Enroladão 3 Queijos': 32, 'Pão Recheado Napolitano': 29, 'Pão de Frango com Requeijão e Mussarela': 32, 'Pão de Frango com Requeijão e Palmito': 32, 'Pão Recheado Vegetariano': 32, 'Pão Recheado 5 Queijos': 32, 'Sabor Tudo 700 gramas': 38, 'Sabor Tudo 1 quilo': 48, 'Rosca de Goiabada': 19, 'Rosca de Coco com Leite Condensado': 25, 'Rosca Húngara': 38, 'Cuca de Doce de Leite': 33, 'Cuca de Goiabada': 31 };
 t(Object.entries(off).every(([n, p]) => SEED.products.find(x => x.name === n && x.price === p)), '19 preços oficiais exatos');
 t(SEED.products.length === 20 && SEED.products.every(p => !/a[çc]a[íi]/i.test(JSON.stringify(p))), '20 produtos, nenhum resquício do açaí');
-t(SEED.settings.pix_key === '' && SEED.settings.pix_holder === 'IVANE VOLPONI DA CUNHA', 'chave PIX não inventada; titular correto');
+t(SEED.settings.pix_key === '+5511943093536' && SEED.settings.pix_holder === 'IVANE VOLPONI DA CUNHA', 'chave PIX informada (celular 11 94309-3536) e titular correto');
+t(SP.pixKey('11943093536') === '+5511943093536' && SP.pixKey('(11) 94309-3536') === '+5511943093536', 'celular digitado sem +55 é convertido');
+t(SP.pixKey('529.982.247-25') === '52998224725', 'CPF válido continua como CPF');
+t(SP.pixKey('loja@email.com') === 'loja@email.com', 'chave e-mail não muda');
+t(SP.pixKeyLabel('+5511943093536') === '(11) 94309-3536 (celular)', 'chave exibida para o cliente: (11) 94309-3536');
+const pixTel = SP.pixPayload('11943093536', 'IVANE VOLPONI DA CUNHA', '', 34);
+t(pixTel.includes('0114+5511943093536') && pixTel.includes('6006BRASIL') && pixTel.includes('540534.00'), 'QR Code PIX com a chave de celular, valor R$ 34,00 (sem cidade → BRASIL)');
 t(SEED.settings.whatsapp === '19999485767', 'WhatsApp (19) 99948-5767');
 
 console.log('\nMensagens e PIX');
