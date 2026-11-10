@@ -75,7 +75,8 @@ const uuid = () => require('crypto').randomUUID();
     const custom = byName('Recheio do Seu Jeito — Seu Pãozinho');
     ok(custom && custom.price_mode === 'quote' && custom.price === null, 'Recheio do Seu Jeito é "consultar", sem preço');
     ok(byName('Sabor Tudo 700 gramas').weight_label === '700 g' && byName('Sabor Tudo 1 quilo').weight_label === '1 kg', 'pesos 700 g e 1 kg cadastrados');
-    ok(cat.settings.pix_holder === 'IVANE VOLPONI DA CUNHA' && cat.settings.pix_key === '', 'PIX: titular cadastrado, chave vazia (não inventada)');
+    ok(cat.settings.pix_holder === 'IVANE VOLPONI DA CUNHA' && cat.settings.pix_key === '+5511943093536', 'PIX: titular e chave (11) 94309-3536 cadastrados');
+    ok(cat.settings.delivery_enabled === false, 'loja configurada só para retirada');
 
     console.log('\n3. Pedido com validação no servidor');
     const trad = byName('Pão Tradicional'), st1 = byName('Sabor Tudo 1 quilo');
@@ -228,7 +229,31 @@ const uuid = () => require('crypto').randomUUID();
     }
     ok(blocked, 'muitos pedidos seguidos do mesmo telefone são bloqueados');
 
-    console.log('\n9. Desempenho com muitos produtos');
+    console.log('\n9. Cadastro de clientes');
+    await as('anon');
+    let rc = (await q(`select public.register_customer($1::jsonb) r`, [JSON.stringify({ name: 'Joana Cadastro', phone: '(19) 91234-5678' })])).rows[0].r;
+    ok(rc.ok === true && rc.phone === '19912345678', 'cliente se cadastra pela loja (nome + WhatsApp)');
+    e = await err(() => q(`select public.register_customer($1::jsonb)`, [JSON.stringify({ name: 'X', phone: '123' })]));
+    ok(e && e.includes('INVALID_CUSTOMER'), 'cadastro com nome/telefone inválido é recusado');
+    ok((await err(() => q(`select * from customers`))) !== null || (await q(`select count(*)::int n from customers`)).rows[0].n === 0, 'visitante não consegue ver a lista de clientes');
+    e = await err(() => q(`select public.upsert_customer('19900000000', 'Hacker', 'cadastro')`));
+    ok(!!e, 'visitante não chama a função interna de gravação');
+    e = await err(() => q(`select public.admin_list_customers()`));
+    ok(!!e, 'visitante não lista clientes');
+    await rpc('create_order', base({ customer: { name: 'Joana Cadastro', phone: '19912345678' }, expected_total: undefined }));
+    await as('authenticated', STRANGER);
+    e = await err(() => q(`select public.admin_list_customers()`));
+    ok(e && e.includes('NOT_ADMIN'), 'usuário que não é admin não lista clientes');
+    await as('authenticated', ADMIN);
+    const cl = (await q(`select public.admin_list_customers() r`)).rows[0].r;
+    const joana = cl.find(c => c.phone === '19912345678'), maria = cl.find(c => c.phone === '19988887777');
+    ok(joana && joana.origin === 'cadastro' && joana.orders_count === 1 && Number(joana.total_spent) > 0, 'admin vê cliente cadastrado com 1 pedido e total gasto');
+    ok(maria && maria.origin === 'pedido' && maria.orders_count >= 3, 'quem só fez pedido também vira cliente automaticamente');
+    ok(!cl.some(c => c.orders_count < 0) && cl.every(c => c.name && c.phone), `${cl.length} clientes listados com nome e telefone`);
+    r = await q(`update customers set notes = 'Prefere pão bem assado' where phone = '19912345678'`);
+    ok(r.affectedRows === 1, 'admin anota observação no cliente');
+
+    console.log('\n10. Desempenho com muitos produtos');
     await as(null);
     await db.exec(`insert into products (category_id, name, description, price, sort_order)
         select (select id from categories order by sort_order limit 1), 'Pão carga ' || g, repeat('descrição ', 8), 10 + (g % 30), 100 + g
