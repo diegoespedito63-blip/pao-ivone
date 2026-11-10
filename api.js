@@ -7,7 +7,13 @@
 (function () {
     'use strict';
     const SP = window.SP;
-    const cfg = window.SP_CONFIG || {};
+    const cfg = Object.assign({}, window.SP_CONFIG || {});
+    cfg.SUPABASE_URL = String(cfg.SUPABASE_URL || '').trim(); cfg.SUPABASE_ANON_KEY = String(cfg.SUPABASE_ANON_KEY || '').trim();
+    // Proteção: se o endereço e a chave forem colados trocados no config.js, destroca sozinho.
+    if (!/^https?:\/\//i.test(cfg.SUPABASE_URL) && /^https?:\/\//i.test(cfg.SUPABASE_ANON_KEY)) {
+        [cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY] = [cfg.SUPABASE_ANON_KEY, cfg.SUPABASE_URL];
+        console.warn('config.js: SUPABASE_URL e SUPABASE_ANON_KEY estavam trocados — corrigido automaticamente.');
+    }
     const LIVE = !!(cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY);
     const API = { mode: LIVE ? 'supabase' : 'demo' };
 
@@ -121,7 +127,7 @@
         let db = null; try { db = JSON.parse(localStorage.getItem(DKEY) || 'null'); } catch (_) { }
         if (db) { db.customers = db.customers || []; return db; }
         if (!window.SP_SEED) {
-            try { await loadScript('seed.js?v=20261110c'); }
+            try { await loadScript('seed.js?v=20261110d'); }
             catch (e) { const er = new Error('Modo demonstração: o arquivo seed.js não foi encontrado. Ele precisa estar na mesma pasta do index.html.'); er.diag = er.message; throw er; }
         }
         const S = window.SP_SEED; const cats = {};
