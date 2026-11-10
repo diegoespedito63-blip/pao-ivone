@@ -23,7 +23,7 @@ body.admin { background: var(--beige-2); }
 .a-brand small { display: block; font-size: .7rem; color: var(--rose); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
 .a-logout { margin-left: auto; background: transparent; color: var(--cream); border-color: rgba(255, 255, 255, .5); }
 .a-logout:hover { background: rgba(255, 255, 255, .1); }
-.a-tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--white); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -6px 20px -12px rgba(0, 0, 0, .3); }
+.a-tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; display: grid; grid-template-columns: repeat(5, 1fr); background: var(--white); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -6px 20px -12px rgba(0, 0, 0, .3); }
 .a-tabs button { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 9px 4px 8px; border: 0; background: none; color: var(--muted); font-weight: 800; font-size: .72rem; min-height: 58px; }
 .a-tabs svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 .a-tabs button[aria-current="page"] { color: var(--brown); }
@@ -61,6 +61,8 @@ body.admin { background: var(--beige-2); }
 .switch span::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); }
 .switch input:checked + span { background: var(--ok); }
 .switch input:checked + span::after { transform: translateX(18px); }
+.cust-ini { display: grid; place-items: center; font-weight: 800; font-size: 1.3rem; color: var(--brown); background: var(--rose-soft) !important; border-radius: 50% !important; }
+a.ibtn { text-decoration: none; }
 .group-title { font-family: var(--serif); font-size: 1.15rem; color: var(--brown); margin: 14px 0 2px; }
 
 /* Pedidos */
