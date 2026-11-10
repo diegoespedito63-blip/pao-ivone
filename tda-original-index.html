@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌿 TDA Açaí</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- TOPBAR -->
+    <header class="topbar" id="topbar">
+        <div class="topbar-inner">
+            <span class="topbar-logo" onclick="contarCliqueAdmin()" style="cursor:default;user-select:none;">🌿 TDA Açaí</span>
+            <div class="topbar-actions">
+                <button class="tb-btn-user" id="btnUser" onclick="openAuthModal()">
+                    <span>👤</span><span id="userLabel">Entrar</span>
+                </button>
+                <button class="tb-btn-track" id="btnTrack" onclick="openTracking()" style="display:none">📦</button>
+            </div>
+        </div>
+    </header>
+    <!-- CAPA -->
+    <div class="store-cover">
+        <img src="./4-copos-escuro.png" alt="TDA Açaí" class="cover-img" onerror="this.style.display='none'">
+        <div class="cover-overlay"></div>
+    </div>
+    <!-- INFO DA LOJA -->
+    <div class="store-info-bar">
+        <div class="store-logo-wrap">
+            <img src="./Copo_thaina.png" alt="Logo" class="store-logo-img" onerror="this.style.background='var(--purple)'">
+        </div>
+        <div class="store-details">
+            <h1 class="store-name">TDA Açaí</h1>
+            <div class="store-meta">
+                <span class="store-status" id="storeStatus">● Verificando…</span>
+                <span class="store-sep">·</span>
+                <span class="store-rating">★ 5.0</span>
+                <span class="store-sep">·</span>
+                <span class="store-addr">📍 Mogi Mirim, SP</span>
+            </div>
+            <button class="store-info-btn" onclick="openStoreInfo()">Ver informações ›</button>
+        </div>
+    </div>
+    <!-- BANNER FRETE GRÁTIS MANACÁS -->
+    <div class="banner-frete-gratis">
+        <span class="banner-icon">🎉</span>
+        <span class="banner-text"><strong>Frete grátis</strong> para moradores do <strong>Condomínio dos Manacás!</strong></span>
+        <span class="banner-tag">Entrega grátis</span>
+    </div>
+    <!-- STICKY NAV -->
+    <div class="sticky-nav" id="stickyNav">
+        <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar no cardápio..." oninput="filterSearch(this.value)">
+        </div>
+        <div class="cat-bar" id="catBar">
+            <button class="cat-pill active" data-cat="all" onclick="filterCat('all',this)">Todos</button>
+            <button class="cat-pill cat-pill--promo" data-cat="promocoes" onclick="filterCat('promocoes',this)" style="display:none">🔥 Promoções</button>
+            <button class="cat-pill" data-cat="copos" onclick="filterCat('copos',this)">Copos</button>
+            <button class="cat-pill" data-cat="combos" onclick="filterCat('combos',this)">Combos</button>
+            <button class="cat-pill" data-cat="garrafas" onclick="filterCat('garrafas',this)">🍶 Garrafa</button>
+            <button class="cat-pill" data-cat="monte" onclick="filterCat('monte',this)">🍧 Monte seu Açaí</button>
+        </div>
+    </div>
+    <!-- PRODUTOS -->
+    <main class="main-content" id="mainContent">
+        <div class="prod-section" data-cat="promocoes" id="sec-promocoes" style="display:none"></div>
+        <div class="prod-section" data-cat="copos" id="sec-copos">
+            <h2 class="prod-section-title">🌴 Nossos Copos</h2>
+            <div class="product-card" data-product="diego" onclick="openProductModal('diego')">
+                <div class="product-info">
+                    <div class="product-name">Copo Diego</div>
+                    <div class="product-desc">Açaí cremoso com leite condensado, paçoca, amendoim e frutas frescas</div>
+                    <div class="product-price">A partir de <strong>R$ 21,00</strong></div>
+                </div>
+                <div class="product-img-wrap">
+                    <img src="./Copo1.png" alt="Copo Diego" class="product-img" loading="lazy">
+                    <div class="product-add-btn">+</div>
+                </div>
+            </div>
+            <div class="product-card" data-product="arthur" onclick="openProductModal('arthur')">
+                <div class="product-info">
+                    <div class="product-name">Copo Arthur</div>
+                    <div class="product-desc">Morango fresco, creme de avelã e leite Ninho em açaí cremoso</div>
+                    <div class="product-price">A partir de <strong>R$ 22,00</strong></div>
+                </div>
+                <div class="product-img-wrap">
+                    <img src="./Copo2.png" alt="Copo Arthur" class="product-img" loading="lazy">
+                    <div class="product-add-btn">+</div>
+                </div>
+            </div>
+            <div class="product-card" data-product="thaina" onclick="openProductModal('thaina')">
+                <div class="product-info">
+                    <div class="product-name">Copo Thaina</div>
+                    <div class="product-desc">Morango fresco, leite condensado e amendoim crocante em açaí cremoso</div>
+                    <div class="product-price">A partir de <strong>R$ 21,00</strong></div>
+                </div>
+                <div class="product-img-wrap">
+                    <img src="./Copo3.png" alt="Copo Thaina" class="product-img" loading="lazy">
+                    <div class="product-add-btn">+</div>
+                </div>
+            </div>
+            <div class="product-card" data-product="davi" onclick="openProductModal('davi')">
+                <div class="product-info">
+                    <div class="product-name">Copo Davi</div>
+                    <div class="product-desc">Banana fresca, leite condensado e granola crocante em açaí refrescante</div>
+                    <div class="product-price">A partir de <strong>R$ 21,00</strong></div>
+                </div>
+                <div class="product-img-wrap">
+                    <img src="./Copo4.png" alt="Copo Davi" class="product-img" loading="lazy">
+                    <div class="product-add-btn">+</div>
+                </div>
+            </div>
+            <div class="product-card" data-product="tda" onclick="openProductModal('tda')">
+                <div class="product-info">
+                    <div class="product-name">Copo TDA</div>
+                    <div class="product-desc">Uva, banana, leite em pó e creme de avelã — equilíbrio perfeito de sabor</div>
+                    <div class="product-price">A partir de <strong>R$ 22,00</strong></div>
+                </div>
+                <div class="product-img-wrap">
+                    <img src="./Diego max.png" alt="Copo TDA" class="product-img" loading="lazy">
+                    <div class="product-add-btn">+</div>
+                </div>
+            </div>
+            <div class="product-card" data-product="kitkat" onclick="openProductModal('kitkat')">
+                <div class="product-info">
+                    <div class="product-name">Copo Kit Kat</div>
+                    <div class="product-desc">Açaí tradicional com creme de Kit Kat, morango fresco e leite em pó</div>
+                    <div class="product-price">A partir de <strong>R$ 22,00</strong></div>
+                </div>
+                <div class="product-img-wrap">
+                    <img src="./KitKat.png" alt="Copo Kit Kat" class="product-img" loading="lazy">
+                    <div class="product-add-btn">+</div>
+                </div>
+            </div>
+        </div>
+        <div class="prod-section" data-cat="combos" id="sec-combos">
+            <h2 class="prod-section-title">👨‍👩‍👧 Combos</h2>
+            <div class="product-card" data-product="combo" onclick="openProductModal('combo')">
+                <div class="product-info">
+                    <div class="product-name">Combo Família</div>
+                    <div class="product-desc">4 copos com açaí, frutas frescas, leite condensado, paçoca, creme de avelã e granola</div>
+                    <div class="product-price"><strong>R$ 69,90</strong></div>
+                </div>
+                <div class="product-img-wrap">
+                    <img src="./4-copos.jpeg" alt="Combo Família" class="product-img" loading="lazy">
+                    <div class="product-add-btn">+</div>
+                </div>
+            </div>
+        </div>
+        <div class="prod-section" data-cat="garrafas" id="sec-garrafas">
+            <h2 class="prod-section-title">🍶 Açaí na Garrafa</h2>
+            <div class="product-card" data-product="garrafa" onclick="openProductModal('garrafa')">
+                <div class="product-info">
+                    <div class="product-name">Açaí na Garrafa</div>
+                    <div class="product-desc">Açaí cremoso com leite em pó e leite condensado — perfeito para levar onde quiser</div>
+                    <div class="product-price"><strong>R$ 16,99</strong></div>
+                </div>
+                <div class="product-img-wrap">
+                    <img src="./garrafa.png" alt="Açaí na Garrafa" class="product-img" loading="lazy" onerror="this.style.fontSize='3rem';this.alt='🍶'">
+                    <div class="product-add-btn">+</div>
+                </div>
+            </div>
+        </div>
+        <!-- MONTE SEU AÇAÍ -->
+        <div class="prod-section" data-cat="monte" id="sec-monte" style="display:none"></div>
+        <div class="empty-search" id="emptySearch" style="display:none">
+            <div class="empty-icon">🍧</div>
+            <p>Nenhum item encontrado.</p>
+            <button class="btn-clear-search" onclick="clearSearch()">Limpar busca</button>
+        </div>
+    </main>
+    <!-- RODAPÉ -->
+    <footer class="store-footer">
+        <div class="store-footer-inner">
+            <div class="footer-block">
+                <h4>🕐 Horários</h4>
+                <p>Seg, Ter, Qui: 13h às 22h</p>
+                <p>Qua e Dom: 13h às 18h</p>
+                <p>Sex: 13h às 17h</p>
+                <p>Sáb: 18h às 22h</p>
+            </div>
+            <div class="footer-block">
+                <h4>📍 Endereço</h4>
+                <p>Rua Maria Magdalena Urban, 17</p>
+                <p>Recanto Di Verona — Mogi Mirim, SP</p>
+                <a href="https://maps.google.com/?q=Rua+Maria+Magdalena+Urban+17+Mogi+Mirim+SP" target="_blank" class="footer-link">Ver no mapa ›</a>
+            </div>
+            <div class="footer-block">
+                <h4>📱 Contato</h4>
+                <p>(19) 99419-4916</p>
+                <a href="https://wa.me/5519994194916" target="_blank" class="footer-wa-btn">💬 WhatsApp</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 TDA Açaí</span>
+        </div>
+    </footer>
+    <!-- CARRINHO FLUTUANTE -->
+    <div class="floating-cart" id="floatingCart" onclick="openCart()" style="display:none">
+        <div class="fc-count" id="fcCount">0</div>
+        <span class="fc-label">Ver carrinho</span>
+        <span class="fc-total" id="fcTotal">R$ 0,00</span>
+        <span class="fc-arrow">›</span>
+    </div>
+    <!-- MODAL: PRODUTO -->
+    <div class="modal-overlay" id="modalProduct" onclick="closeModalOnOverlay(event,'modalProduct')">
+        <div class="modal modal--product">
+            <button class="modal-close modal-close--over" onclick="closeModal('modalProduct')">✕</button>
+            <div class="prod-modal-img-wrap"><img id="prodModalImg" src="" alt="" class="prod-modal-img"></div>
+            <div class="prod-modal-body">
+                <h2 class="prod-modal-name" id="prodModalName"></h2>
+                <p class="prod-modal-desc" id="prodModalDesc"></p>
+                <div class="prod-sizes-title" id="prodSizesTitle" style="display:none">Escolha o tamanho:</div>
+                <div class="prod-sizes" id="prodModalSizes"></div>
+                <div class="prod-modal-footer">
+                    <div class="prod-qty">
+                        <button class="prod-qty-btn" onclick="prodQtyChange(-1)">−</button>
+                        <span class="prod-qty-val" id="prodQtyVal">1</span>
+                        <button class="prod-qty-btn" onclick="prodQtyChange(1)">+</button>
+                    </div>
+                    <button class="btn btn-primary prod-add-btn" id="prodAddBtn" onclick="addSelectedToCart()">
+                        Adicionar · <span id="prodAddPrice">R$ 0,00</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL: INFO DA LOJA -->
+    <div class="modal-overlay" id="modalStoreInfo" onclick="closeModalOnOverlay(event,'modalStoreInfo')">
+        <div class="modal modal--storeinfo">
+            <button class="modal-close" onclick="closeModal('modalStoreInfo')">✕</button>
+            <h2 class="modal-title">🌿 TDA Açaí</h2>
+            <div class="si-block">
+                <h4>🕐 Horários</h4>
+                <div class="si-row"><span>Segunda-feira</span><span>13h às 22h</span></div>
+                <div class="si-row"><span>Terça-feira</span><span>13h às 22h</span></div>
+                <div class="si-row"><span>Quarta-feira</span><span>13h às 18h</span></div>
+                <div class="si-row"><span>Quinta-feira</span><span>13h às 22h</span></div>
+                <div class="si-row"><span>Sexta-feira</span><span>13h às 17h</span></div>
+                <div class="si-row"><span>Sábado</span><span>18h às 22h</span></div>
+                <div class="si-row"><span>Domingo</span><span>13h às 18h</span></div>
+            </div>
+            <div class="si-block">
+                <h4>🚚 Entrega</h4>
+                <div class="si-row"><span>Taxa padrão</span><span id="siTaxaEntrega">R$ 5,00</span></div>
+                <div class="frete-gratis-info">🎉 <strong>Frete grátis</strong> para moradores do <strong>Condomínio dos Manacás!</strong></div>
+            </div>
+            <div class="si-block">
+                <h4>💳 Formas de Pagamento</h4>
+                <div class="si-pay-list">
+                    <span class="si-pay-tag">📲 PIX</span>
+                    <span class="si-pay-tag">💳 Débito</span>
+                    <span class="si-pay-tag">💳 Crédito</span>
+                    <span class="si-pay-tag">💵 Dinheiro</span>
+                </div>
+            </div>
+            <a href="https://wa.me/5519994194916" target="_blank" class="btn btn-whatsapp btn-full">📱 Falar no WhatsApp</a>
+        </div>
+    </div>
+    <!-- MODAL: AUTH -->
+    <div class="modal-overlay" id="modalAuth" onclick="closeModalOnOverlay(event,'modalAuth')">
+        <div class="modal modal--auth">
+            <button class="modal-close" onclick="closeModal('modalAuth')">✕</button>
+            <h2 class="modal-title">🌿 Minha Conta</h2>
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Entrar</button>
+                <button class="auth-tab" id="tabCadastro" onclick="switchTab('cadastro')">Cadastrar</button>
+            </div>
+            <div id="panelLogin">
+                <p class="auth-hint">Digite seu telefone para acessar sua conta.</p>
+                <div class="form-group"><label>Telefone (com DDD)</label><input type="tel" id="loginPhone" placeholder="(19) 99999-9999" class="form-input"></div>
+                <button class="btn btn-primary btn-full" onclick="doLogin()">Entrar</button>
+                <p class="auth-switch">Não tem conta? <a onclick="switchTab('cadastro')">Cadastre-se</a></p>
+            </div>
+            <div id="panelCadastro" style="display:none">
+                <div class="form-group"><label>Nome completo *</label><input type="text" id="regName" placeholder="Seu nome" class="form-input"></div>
+                <div class="form-group"><label>Telefone *</label><input type="tel" id="regPhone" placeholder="(19) 99999-9999" class="form-input"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Rua *</label><input type="text" id="regStreet" class="form-input"></div>
+                    <div class="form-group form-group--sm"><label>Nº *</label><input type="text" id="regNumber" class="form-input"></div>
+                </div>
+                <div class="form-group"><label>Bairro *</label><input type="text" id="regNeighborhood" class="form-input"></div>
+                <div class="form-group"><label>Complemento <span class="optional">(opcional)</span></label><input type="text" id="regComplement" class="form-input"></div>
+                <div class="form-group"><label>Cidade *</label><input type="text" id="regCity" class="form-input" value="Mogi Mirim"></div>
+                <button class="btn btn-primary btn-full" onclick="doRegister()">Criar Conta</button>
+                <p class="auth-switch">Já tem conta? <a onclick="switchTab('login')">Entrar</a></p>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL: CARRINHO -->
+    <div class="modal-overlay" id="modalCart" onclick="closeModalOnOverlay(event,'modalCart')">
+        <div class="modal modal--cart">
+            <div class="cart-header">
+                <h2>🛒 Meu Carrinho</h2>
+                <button class="modal-close modal-close--inline" onclick="closeModal('modalCart')">✕</button>
+            </div>
+            <div id="cartEmpty" class="cart-empty"><p>🍧</p><p>Seu carrinho está vazio!</p><button class="btn btn-primary" onclick="closeModal('modalCart')">Ver Cardápio</button></div>
+            <div id="cartItems" style="display:none">
+                <div id="cartItemsList"></div>
+                <div class="cart-summary">
+                    <div class="summary-row"><span>Subtotal</span><span id="cartSubtotal">R$ 0,00</span></div>
+                    <div class="summary-row"><span>Taxa de entrega</span><span id="cartDelivery">R$ 0,00</span></div>
+                    <div class="summary-row summary-row--total"><span>Total</span><span id="cartTotal">R$ 0,00</span></div>
+                </div>
+                <button class="btn btn-primary btn-full" onclick="openCheckout()">Finalizar Pedido →</button>
+                <button class="btn btn-outline btn-full" onclick="clearCart()">Esvaziar carrinho</button>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL: CHECKOUT -->
+    <div class="modal-overlay" id="modalCheckout" onclick="closeModalOnOverlay(event,'modalCheckout')">
+        <div class="modal modal--checkout">
+            <button class="modal-close" onclick="closeModal('modalCheckout')">✕</button>
+            <h2 class="modal-title">📋 Finalizar Pedido</h2>
+            <div class="checkout-section">
+                <h3>📍 Endereço de Entrega</h3>
+                <div class="form-row">
+                    <div class="form-group"><label>Rua *</label><input type="text" id="chkStreet" class="form-input"></div>
+                    <div class="form-group form-group--sm"><label>Nº *</label><input type="text" id="chkNumber" class="form-input"></div>
+                </div>
+                <div class="form-group">
+                    <label>Bairro *</label>
+                    <input type="text" id="chkNeighborhood" class="form-input" oninput="verificarFreteGratis(this.value)">
+                </div>
+                <div id="freteGratisAviso" class="frete-gratis-aviso" style="display:none">
+                    🎉 <strong>Frete grátis!</strong> Morador do Condomínio dos Manacás.
+                </div>
+                <label id="labelManacas" style="display:flex;align-items:center;gap:10px;margin:10px 0 14px;padding:12px 14px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;cursor:pointer;font-size:.9rem;">
+                    <input type="checkbox" id="chkManacas" onchange="onManacasToggle(this.checked)"
+                        style="width:18px;height:18px;accent-color:#16a34a;cursor:pointer;flex-shrink:0;">
+                    <span>🎉 Moro no <strong>Cond. dos Manacás</strong> — frete grátis!</span>
+                </label>
+                <div class="form-group"><label>Complemento</label><input type="text" id="chkComplement" class="form-input" placeholder="Apto, bloco..."></div>
+                <div class="form-group"><label>Cidade *</label><input type="text" id="chkCity" class="form-input"></div>
+            </div>
+            <div class="checkout-section">
+                <h3>💳 Forma de Pagamento</h3>
+                <div class="payment-options">
+                    <label class="payment-opt"><input type="radio" name="payment" value="pix" onchange="onPaymentChange('pix')"><span class="payment-opt-box"><span class="payment-icon">📲</span><span>PIX</span></span></label>
+                    <label class="payment-opt"><input type="radio" name="payment" value="debito" onchange="onPaymentChange('debito')"><span class="payment-opt-box"><span class="payment-icon">💳</span><span>Débito</span></span></label>
+                    <label class="payment-opt"><input type="radio" name="payment" value="credito" onchange="onPaymentChange('credito')"><span class="payment-opt-box"><span class="payment-icon">💳</span><span>Crédito</span></span></label>
+                    <label class="payment-opt"><input type="radio" name="payment" value="dinheiro" onchange="onPaymentChange('dinheiro')"><span class="payment-opt-box"><span class="payment-icon">💵</span><span>Dinheiro</span></span></label>
+                </div>
+                <div id="paymentNoticeCard" class="payment-notice payment-notice--card" style="display:none">🛵 <strong>Atenção:</strong> Levaremos a maquininha no momento da entrega!</div>
+                <div id="paymentNoticeMoney" class="payment-notice payment-notice--money" style="display:none">💵 <strong>Dinheiro:</strong> Precisa de troco?<input type="text" id="changeFor" class="form-input" placeholder="Troco para R$..." style="margin-top:8px"></div>
+            </div>
+            <div class="checkout-total"><span>Total do pedido:</span><strong id="chkTotal">R$ 0,00</strong></div>
+            <button class="btn btn-primary btn-full" onclick="confirmOrder()">Confirmar Pedido ✓</button>
+        </div>
+    </div>
+    <!-- MODAL: RESUMO -->
+    <div class="modal-overlay" id="modalSummary">
+        <div class="modal modal--summary">
+            <button class="modal-close" onclick="closeModal('modalSummary')">✕</button>
+            <div class="summary-header">
+                <div class="summary-check">✓</div>
+                <h2>Pedido Confirmado!</h2>
+                <p>Revise os detalhes abaixo</p>
+            </div>
+            <div id="summaryContent"></div>
+            <div id="pixSection" style="display:none">
+                <div class="pix-box">
+                    <h3>📲 Pague via PIX</h3>
+                    <canvas id="pixQRCode" class="pix-qr-canvas"></canvas>
+                    <p class="pix-key-label">Chave PIX:</p>
+                    <div class="pix-key-value" id="pixKeyDisplay"></div>
+                    <button class="btn btn-outline btn-sm" onclick="copyPixKey()">📋 Copiar Chave</button>
+                    <p class="pix-amount-label">Valor a pagar: <strong id="pixAmount"></strong></p>
+                    <div class="pix-comprovante-notice">📩 <strong>Após o pagamento</strong>, envie o comprovante: <a href="https://wa.me/5519994194916" target="_blank" class="pix-wa-link">📱 (19) 99419-4916</a></div>
+                </div>
+            </div>
+            <div class="summary-actions" id="summaryActions">
+                <button class="btn btn-whatsapp btn-full" onclick="sendToWhatsApp(false)">📱 Reenviar pelo WhatsApp</button>
+                <button class="btn btn-outline btn-full" id="btnFinishOrder" onclick="finishOrder()">✓ Concluir pedido</button>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL: RASTREAMENTO -->
+    <div class="modal-overlay" id="modalTracking" onclick="closeModalOnOverlay(event,'modalTracking')">
+        <div class="modal modal--tracking">
+            <button class="modal-close" onclick="closeModal('modalTracking')">✕</button>
+            <h2 class="modal-title">📦 Meus Pedidos</h2>
+            <div id="trackingContent"></div>
+        </div>
+    </div>
+    <!-- MODAL: ADMIN -->
+    <div class="modal-overlay" id="modalAdmin" onclick="closeModalOnOverlay(event,'modalAdmin')">
+        <div class="modal modal--admin">
+            <button class="modal-close" onclick="closeModal('modalAdmin')">✕</button>
+            <h2 class="modal-title">⚙️ Configurações Admin</h2>
+            <div id="adminLoginPanel">
+                <p>Senha de administrador:</p>
+                <div class="form-group"><input type="password" id="adminPassword" class="form-input" placeholder="Senha" onkeydown="if(event.key==='Enter')checkAdminPass()"></div>
+                <button class="btn btn-primary btn-full" onclick="checkAdminPass()">Entrar</button>
+            </div>
+            <div id="adminPanel" style="display:none">
+                <div class="admin-tabs">
+                    <button class="admin-tab active" id="adminTabConfig" onclick="switchAdminTab('config')">⚙️ Config</button>
+                    <button class="admin-tab" id="adminTabOrders" onclick="switchAdminTab('orders')">📋 Pedidos</button>
+                </div>
+                <div id="adminPanelConfig">
+                    <div class="admin-section">
+                        <h3>🚚 Taxa de Entrega</h3>
+                        <div class="form-group"><label>Valor (R$)</label><input type="number" id="adminDeliveryFee" class="form-input" step="0.50" min="0"></div>
+                    </div>
+                    <div class="admin-section">
+                        <h3>📲 Dados do PIX</h3>
+                        <div class="form-group"><label>Chave PIX</label><input type="text" id="adminPixKey" class="form-input"></div>
+                        <div class="form-group"><label>Nome do recebedor (máx. 25)</label><input type="text" id="adminPixName" class="form-input" maxlength="25"></div>
+                        <div class="form-group"><label>Cidade (máx. 15)</label><input type="text" id="adminPixCity" class="form-input" maxlength="15"></div>
+                    </div>
+                    <div class="admin-section">
+                        <h3>📊 Google Sheets</h3>
+                        <p style="font-size:0.8rem;color:#6b7280;margin-bottom:8px">URL do Apps Script para envio automático dos pedidos.</p>
+                        <div class="form-group"><input type="url" id="adminSheetsUrl" class="form-input" placeholder="https://script.google.com/macros/s/..."></div>
+                        <div id="sheetsStatus" style="font-size:0.8rem;margin-top:6px"></div>
+                        <button class="btn btn-outline btn-sm" style="margin-top:8px" onclick="testarConexaoSheets()">🔗 Testar conexão</button>
+                    </div>
+                    <div class="admin-section">
+                        <h3>🔐 Senha Admin</h3>
+                        <div class="form-group"><label>Nova senha (em branco = não altera)</label><input type="password" id="adminNewPass" class="form-input"></div>
+                    </div>
+                    <button class="btn btn-primary btn-full" onclick="saveAdminSettings()">💾 Salvar</button>
+                </div>
+                <div id="adminPanelOrders" style="display:none"><div id="adminOrdersList"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADMIN PRODUTOS (oculto — acesso por 5 cliques no logo) -->
+    <div class="modal-overlay" id="modalAdminProd" onclick="closeModalOnOverlay(event,'modalAdminProd')">
+        <div class="modal" style="max-height:92vh;">
+            <button class="modal-close" onclick="closeModal('modalAdminProd')">✕</button>
+
+            <!-- Tela de senha -->
+            <div id="apSenhaPanel">
+                <h2 class="modal-title">🔐 Admin</h2>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="apSenha" class="form-input" placeholder="Senha de administrador"
+                        onkeydown="if(event.key==='Enter') verificarSenhaAP()">
+                </div>
+                <button class="btn btn-primary btn-full" onclick="verificarSenhaAP()">Entrar</button>
+            </div>
+
+            <!-- Painel autenticado -->
+            <div id="apPainel" style="display:none;">
+                <div class="admin-tabs">
+                    <button class="admin-tab active" id="apTabProdutos"   onclick="switchAPTab('produtos')">📋 Produtos</button>
+                    <button class="admin-tab"         id="apTabAdicionar" onclick="switchAPTab('adicionar')">➕ Adicionar</button>
+                </div>
+
+                <!-- ABA: Lista de produtos -->
+                <div id="apTabProdutosPanel">
+                    <p style="font-size:.78rem;color:#6b7280;margin-bottom:12px;">Clique em <strong>Ocultar</strong> para remover do cardápio, ou <strong>Mostrar</strong> para reexibir. Produtos extras podem ser excluídos (🗑).</p>
+                    <div id="apListaProdutos"></div>
+                </div>
+
+                <!-- ABA: Adicionar produto -->
+                <div id="apTabAdicionarPanel" style="display:none;">
+                    <div class="form-group">
+                        <label>Nome do Produto *</label>
+                        <input type="text" id="apNome" class="form-input" placeholder="Ex: Copo Especial">
+                    </div>
+                    <div class="form-group">
+                        <label>Categoria *</label>
+                        <select id="apCat" class="form-input">
+                            <option value="copos">Copos</option>
+                            <option value="combos">Combos</option>
+                            <option value="garrafas">Garrafas</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Descrição *</label>
+                        <textarea id="apDesc" class="form-input" rows="2" placeholder="Descreva o produto..." style="resize:vertical;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>URL da Imagem <span class="optional">(opcional)</span></label>
+                        <input type="url" id="apImg" class="form-input" placeholder="https://drive.google.com/...">
+                        <small style="color:#6b7280;font-size:.75rem;">Link do Google Drive (compartilhado) ou qualquer URL de imagem</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Tamanhos e Preços *</label>
+                        <div id="apTamanhos">
+                            <div class="ap-row" style="display:flex;gap:8px;margin-bottom:8px;">
+                                <input type="text"   class="form-input" placeholder="300ml"  style="flex:1;">
+                                <input type="number" class="form-input" placeholder="21.00" min="0" step="0.01" style="width:100px;">
+                                <button onclick="apRemRow(this)" style="background:#fee2e2;border:none;border-radius:8px;padding:0 10px;color:#dc2626;font-size:1rem;font-weight:700;cursor:pointer;flex-shrink:0;">✕</button>
+                            </div>
+                        </div>
+                        <button onclick="apAddRow()" class="btn btn-outline btn-sm" style="margin-top:2px;">+ Tamanho</button>
+                    </div>
+                    <button class="btn btn-primary btn-full" onclick="apSalvar()">💾 Adicionar Produto</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

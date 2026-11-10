@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Sabor de Pão | Cardápio e encomendas</title>
+    <meta name="description" content="Sabor de Pão — pães artesanais tradicionais, recheados e doces. Faça sua encomenda e retire no local.">
+    <meta name="theme-color" content="#4a2c21">
+    <meta property="og:title" content="Sabor de Pão — Cardápio">
+    <meta property="og:description" content="Um sabor especial em cada pedaço! Faça sua encomenda.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1608198093002-ad4e005484ec?auto=format&fit=crop&w=1200&h=630&q=60">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%234a2c21'/%3E%3Cpath d='M32 50V20M32 26c-6-2-9-7-9-11 5 1 9 5 9 11zm0 0c6-2 9-7 9-11-5 1-9 5-9 11zm0 9c-6-2-9-7-9-11 5 1 9 5 9 11zm0 0c6-2 9-7 9-11-5 1-9 5-9 11zm0 9c-6-2-9-7-9-11 5 1 9 5 9 11zm0 0c6-2 9-7 9-11-5 1-9 5-9 11z' stroke='%23e8a9b4' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1608198093002-ad4e005484ec?auto=format&fit=crop&w=828&h=360&q=60" fetchpriority="high">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,500&display=swap"></noscript>
+    <link rel="stylesheet" href="style.css">
+    <script src="config.js" defer></script>
+    <script src="core.js" defer></script>
+    <script src="api.js" defer></script>
+    <script src="store.js" defer></script>
+</head>
+<body>
+
+<!-- TOPO -->
+<header class="topbar">
+    <div class="topbar-in">
+        <span class="top-logo" id="brand">
+            <span class="top-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 40V12M24 17c-4.5-1.5-7-5-7-8.5 4 .8 7 4 7 8.5zm0 0c4.5-1.5 7-5 7-8.5-4 .8-7 4-7 8.5zm0 8c-4.5-1.5-7-5-7-8.5 4 .8 7 4 7 8.5zm0 0c4.5-1.5 7-5 7-8.5-4 .8-7 4-7 8.5zm0 8c-4.5-1.5-7-5-7-8.5 4 .8 7 4 7 8.5zm0 0c4.5-1.5 7-5 7-8.5-4 .8-7 4-7 8.5z" fill="none" stroke="#e8a9b4" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+            <span data-s="business_name">Sabor de Pão</span>
+        </span>
+        <div class="top-actions">
+            <button class="top-btn" id="btnOrders" type="button">📦 <span>Meus pedidos</span></button>
+            <button class="top-btn top-btn-icon" id="btnAccount" type="button" aria-label="Meus dados">👤</button>
+        </div>
+    </div>
+</header>
+<div class="demo-bar" id="demoBar" hidden>Modo demonstração — pedidos ficam só neste aparelho.</div>
+
+<!-- CAPA -->
+<div class="cover">
+    <img class="cover-img" id="coverImg" alt="" width="828" height="360" fetchpriority="high" decoding="async"
+         src="https://images.unsplash.com/photo-1608198093002-ad4e005484ec?auto=format&fit=crop&w=828&h=360&q=60">
+    <div class="cover-shade"></div>
+</div>
+
+<!-- INFORMAÇÕES DA LOJA -->
+<section class="store-bar">
+    <div class="store-logo" id="storeLogo" aria-hidden="true">
+        <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#4a2c21"/><path d="M24 39V13M24 18c-4.5-1.5-7-5-7-8.5 4 .8 7 4 7 8.5zm0 0c4.5-1.5 7-5 7-8.5-4 .8-7 4-7 8.5zm0 7c-4.5-1.5-7-5-7-8.5 4 .8 7 4 7 8.5zm0 0c4.5-1.5 7-5 7-8.5-4 .8-7 4-7 8.5zm0 7c-4.5-1.5-7-5-7-8.5 4 .8 7 4 7 8.5zm0 0c4.5-1.5 7-5 7-8.5-4 .8-7 4-7 8.5z" fill="none" stroke="#e8a9b4" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </div>
+    <h1 class="store-name" data-s="business_name">Sabor de Pão</h1>
+    <p class="store-slogan" data-s="hero_title">Um sabor especial em cada pedaço!</p>
+    <div class="store-meta">
+        <span class="status" id="storeStatus" hidden></span>
+        <span class="meta-item">🛍️ Retirada no local</span>
+        <span class="meta-item" id="storeCity" hidden></span>
+    </div>
+    <div class="store-actions">
+        <button class="link" type="button" id="btnInfo">Ver informações ›</button>
+        <a class="btn btn-wa btn-sm js-wa" href="#" data-wa="Olá! Gostaria de fazer uma encomenda.">💬 WhatsApp</a>
+    </div>
+</section>
+
+<!-- AVISO -->
+<div class="notice" id="notice">
+    <span class="notice-ic">🥖</span>
+    <span class="notice-txt" id="noticeText">Faça sua encomenda pelo site e <b>retire no local</b>!</span>
+</div>
+
+<!-- BUSCA E CATEGORIAS (fixo no topo) -->
+<nav class="sticky-nav" id="stickyNav" aria-label="Cardápio">
+    <label class="search">
+        <span aria-hidden="true">🔍</span>
+        <input type="search" id="search" placeholder="Buscar no cardápio..." autocomplete="off" aria-label="Buscar no cardápio">
+    </label>
+    <div class="pills" id="pills"></div>
+</nav>
+
+<!-- PRODUTOS -->
+<main class="menu" id="menu" aria-live="polite">
+    <div class="sk-list"><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
+</main>
+<div class="empty" id="emptySearch" hidden>
+    <p>🥖</p><p>Nenhum item encontrado.</p>
+    <button class="btn btn-outline btn-sm" type="button" id="clearSearch">Limpar busca</button>
+</div>
+
+<!-- RODAPÉ -->
+<footer class="footer">
+    <div class="footer-grid" id="footerInfo"></div>
+    <blockquote class="verse">
+        <p data-s="verse">O Senhor é o meu Pastor e nada me faltará.</p>
+        <cite data-s="verse_ref">Salmos 23:1</cite>
+    </blockquote>
+    <p class="footer-quote" data-s="quote">Você é a parte visível de Deus.</p>
+    <p class="footer-copy">© <span id="year"></span> <span data-s="business_name">Sabor de Pão</span></p>
+</footer>
+
+<!-- CARRINHO FLUTUANTE -->
+<button class="cart-bar" id="cartBar" type="button" hidden>
+    <span class="cb-count" id="cbCount">0</span>
+    <span class="cb-label">Ver carrinho</span>
+    <strong id="cbTotal">R$ 0,00</strong>
+    <span class="cb-arrow">›</span>
+</button>
+
+<!-- MODAL: PRODUTO -->
+<div class="overlay" id="mProduct" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="pmName">
+        <button class="x x-over" type="button" data-close aria-label="Fechar">✕</button>
+        <div class="pm-img" id="pmImgWrap"><img id="pmImg" alt="" width="800" height="600"></div>
+        <div class="pm-body">
+            <h2 id="pmName"></h2>
+            <div class="pm-tags" id="pmTags"></div>
+            <p class="pm-desc" id="pmDesc"></p>
+            <div id="pmVariants"></div>
+            <div id="pmAddons"></div>
+        </div>
+        <div class="pm-foot">
+            <div class="qty">
+                <button type="button" id="pmMinus" aria-label="Diminuir">−</button>
+                <output id="pmQty">1</output>
+                <button type="button" id="pmPlus" aria-label="Aumentar">+</button>
+            </div>
+            <button class="btn btn-primary btn-block" type="button" id="pmAdd">Adicionar · <span id="pmTotal"></span></button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: RECHEIO DO SEU JEITO -->
+<div class="overlay" id="mCustom" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="cmTitle">
+        <button class="x x-over" type="button" data-close aria-label="Fechar">✕</button>
+        <div class="pm-img pm-img-sm" id="cmImgWrap"><img id="cmImg" alt="" width="800" height="400"></div>
+        <form class="form pad" id="customForm" novalidate>
+            <h2 id="cmTitle">Recheio do Seu Jeito</h2>
+            <p class="note">Escolha o recheio que quiser. Respondemos pelo WhatsApp com o <b>valor e a disponibilidade</b>.</p>
+            <label>Recheio desejado *<input name="filling" required maxlength="300" placeholder="Ex.: calabresa com requeijão"></label>
+            <label>Ingredientes<textarea name="ingredients" rows="2" maxlength="500" placeholder="Quais ingredientes você quer?"></textarea></label>
+            <label>Observações<textarea name="notes" rows="2" maxlength="500" placeholder="Ex.: sem cebola"></textarea></label>
+            <div class="row2">
+                <label>Quantidade *<input name="qty" type="number" min="1" max="500" value="1" inputmode="numeric" required></label>
+                <label>Para quando?<input name="date" type="date"></label>
+            </div>
+            <label>Seu nome *<input name="name" required maxlength="100" autocomplete="name"></label>
+            <label>Seu WhatsApp *<input name="phone" type="tel" required inputmode="tel" autocomplete="tel" placeholder="(19) 99999-9999"></label>
+            <button class="btn btn-wa btn-block btn-lg" type="submit" id="cmSubmit">CONSULTAR PELO WHATSAPP</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL: CARRINHO -->
+<div class="overlay" id="mCart" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
+        <div class="sheet-head"><h2 id="cartTitle">🛒 Meu carrinho</h2><button class="x" type="button" data-close aria-label="Fechar">✕</button></div>
+        <div class="pad" id="cartBody"></div>
+    </div>
+</div>
+
+<!-- MODAL: FINALIZAR -->
+<div class="overlay" id="mCheckout" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="coTitle">
+        <div class="sheet-head"><h2 id="coTitle">📋 Finalizar pedido</h2><button class="x" type="button" data-close aria-label="Fechar">✕</button></div>
+        <form class="form pad" id="checkoutForm" novalidate>
+            <div class="co-block">
+                <h3>👤 Seus dados</h3>
+                <label>Nome *<input name="name" required maxlength="100" autocomplete="name" placeholder="Seu nome"></label>
+                <label>WhatsApp *<input name="phone" type="tel" required inputmode="tel" autocomplete="tel" placeholder="(19) 99999-9999"></label>
+            </div>
+            <div class="co-block" id="fulfillBlock">
+                <h3>🛍️ Como vai receber?</h3>
+                <div class="choices" id="fulfillChoices">
+                    <label class="choice" data-f="retirada"><input type="radio" name="fulfillment" value="retirada"><span>🛍️ Retirada</span></label>
+                    <label class="choice" data-f="entrega"><input type="radio" name="fulfillment" value="entrega"><span>🛵 Entrega</span></label>
+                </div>
+                <div id="addressBox" hidden>
+                    <div class="row2 row-street">
+                        <label>Rua *<input name="street" maxlength="150"></label>
+                        <label>Nº *<input name="number" maxlength="20" inputmode="numeric"></label>
+                    </div>
+                    <div class="row2">
+                        <label>Bairro *<input name="district" maxlength="100"></label>
+                        <label>Cidade *<input name="city" maxlength="100"></label>
+                    </div>
+                    <label>Complemento<input name="complement" maxlength="100"></label>
+                    <input type="hidden" name="reference">
+                </div>
+            </div>
+            <div class="co-block">
+                <h3>📅 Retirada</h3>
+                <p class="note" id="pickupNote">Você retira o pedido no local.</p>
+                <label>Para qual dia? <span class="muted">(opcional)</span><input name="date" type="date"></label>
+            </div>
+            <div class="co-block">
+                <h3>💳 Forma de pagamento</h3>
+                <div class="choices choices-4">
+                    <label class="choice"><input type="radio" name="payment" value="pix"><span>📲 PIX</span></label>
+                    <label class="choice"><input type="radio" name="payment" value="dinheiro"><span>💵 Dinheiro</span></label>
+                    <label class="choice"><input type="radio" name="payment" value="debito"><span>💳 Débito</span></label>
+                    <label class="choice"><input type="radio" name="payment" value="credito"><span>💳 Crédito</span></label>
+                </div>
+                <label id="changeBox" hidden>Precisa de troco? Para quanto?<input name="change" maxlength="30" inputmode="decimal" placeholder="Ex.: R$ 100,00"></label>
+            </div>
+            <div class="co-block">
+                <h3>📝 Observações</h3>
+                <textarea name="notes" rows="2" maxlength="1000" placeholder="Algum detalhe sobre o pedido?"></textarea>
+            </div>
+            <div class="co-summary" id="coSummary"></div>
+            <p class="form-error" id="coError" role="alert" hidden></p>
+            <button class="btn btn-primary btn-block btn-lg" type="submit" id="coSubmit">Confirmar pedido ✓</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL: PEDIDO CONFIRMADO -->
+<div class="overlay" id="mDone" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="doneTitle">
+        <button class="x x-over" type="button" data-close aria-label="Fechar">✕</button>
+        <div class="pad done" id="doneBody"></div>
+    </div>
+</div>
+
+<!-- MODAL: INFORMAÇÕES -->
+<div class="overlay" id="mInfo" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+        <div class="sheet-head"><h2 id="infoTitle">🥖 <span data-s="business_name">Sabor de Pão</span></h2><button class="x" type="button" data-close aria-label="Fechar">✕</button></div>
+        <div class="pad" id="infoBody"></div>
+    </div>
+</div>
+
+<!-- MODAL: MEUS PEDIDOS -->
+<div class="overlay" id="mOrders" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ordTitle">
+        <div class="sheet-head"><h2 id="ordTitle">📦 Meus pedidos</h2><button class="x" type="button" data-close aria-label="Fechar">✕</button></div>
+        <div class="pad" id="ordersBody"></div>
+    </div>
+</div>
+
+<!-- MODAL: MEUS DADOS -->
+<div class="overlay" id="mAccount" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="accTitle">
+        <div class="sheet-head"><h2 id="accTitle">👤 Meus dados</h2><button class="x" type="button" data-close aria-label="Fechar">✕</button></div>
+        <form class="form pad" id="accountForm">
+            <p class="muted">Seus dados ficam salvos só neste celular, para preencher o próximo pedido mais rápido.</p>
+            <label>Nome<input name="name" maxlength="100" autocomplete="name"></label>
+            <label>WhatsApp<input name="phone" type="tel" inputmode="tel" autocomplete="tel"></label>
+            <button class="btn btn-primary btn-block" type="submit">Salvar</button>
+            <button class="btn btn-outline btn-block" type="button" id="accClear" style="margin-top:8px">Apagar meus dados</button>
+        </form>
+    </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Painel | Sabor de Pão</title>
+    <meta name="theme-color" content="#4a2c21">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%234a2c21'/%3E%3Cpath d='M32 50V20M32 26c-6-2-9-7-9-11 5 1 9 5 9 11zm0 0c6-2 9-7 9-11-5 1-9 5-9 11zm0 9c-6-2-9-7-9-11 5 1 9 5 9 11zm0 0c6-2 9-7 9-11-5 1-9 5-9 11zm0 9c-6-2-9-7-9-11 5 1 9 5 9 11zm0 0c6-2 9-7 9-11-5 1-9 5-9 11z' stroke='%23e8a9b4' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
+    <script src="config.js" defer></script>
+    <script src="core.js" defer></script>
+    <script src="api.js" defer></script>
+    <script src="admin.js" defer></script>
+</head>
+<body class="admin">
+
+<!-- ══ LOGIN ══ -->
+<section class="login" id="login" hidden>
+    <form class="login-card form" id="loginForm">
+        <div class="login-brand">
+            <span class="brand-mark"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="23" fill="currentColor"/><path d="M24 38V14M24 19c-4.5-1.5-7-5-7-8.5 4 .8 7 4 7 8.5zm0 0c4.5-1.5 7-5 7-8.5-4 .8-7 4-7 8.5zm0 7c-4.5-1.5-7-5-7-8.5 4 .8 7 4 7 8.5zm0 0c4.5-1.5 7-5 7-8.5-4 .8-7 4-7 8.5zm0 7c-4.5-1.5-7-5-7-8.5 4 .8 7 4 7 8.5zm0 0c4.5-1.5 7-5 7-8.5-4 .8-7 4-7 8.5z" fill="none" stroke="#e8a9b4" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+            <div><h1>Sabor de Pão</h1><p class="muted">Painel administrativo</p></div>
+        </div>
+        <label id="emailWrap">E-mail<input name="email" type="email" autocomplete="username" required></label>
+        <label>Senha<input name="password" type="password" autocomplete="current-password" required></label>
+        <p class="form-error" id="loginError" hidden></p>
+        <button class="btn btn-brown btn-block btn-lg" type="submit" id="loginBtn">Entrar</button>
+        <p class="note tiny" id="demoNote" hidden>Modo demonstração: o Supabase ainda não foi configurado em <code>config.js</code>. Os dados ficam apenas neste navegador. Senha inicial: <b>1234</b> (troque em Configurações).</p>
+        <p class="center tiny"><a href="index.html">← Voltar à loja</a></p>
+    </form>
+</section>
+
+<!-- ══ PAINEL ══ -->
+<div class="app" id="app" hidden>
+    <header class="a-top">
+        <div class="a-top-in">
+            <a class="a-brand" href="index.html" target="_blank" rel="noopener" title="Abrir a loja">
+                <span class="brand-mark" id="aLogo"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="23" fill="currentColor"/><path d="M24 38V14M24 19c-4.5-1.5-7-5-7-8.5 4 .8 7 4 7 8.5zm0 0c4.5-1.5 7-5 7-8.5-4 .8-7 4-7 8.5zm0 7c-4.5-1.5-7-5-7-8.5 4 .8 7 4 7 8.5zm0 0c4.5-1.5 7-5 7-8.5-4 .8-7 4-7 8.5zm0 7c-4.5-1.5-7-5-7-8.5 4 .8 7 4 7 8.5zm0 0c4.5-1.5 7-5 7-8.5-4 .8-7 4-7 8.5z" fill="none" stroke="#e8a9b4" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+                <span><b>Sabor de Pão</b><small id="modeBadge">Painel</small></span>
+            </a>
+            <nav class="a-tabs" id="tabs" aria-label="Seções do painel">
+                <button type="button" data-tab="orders" aria-current="page"><svg viewBox="0 0 24 24"><path d="M9 5h10M9 12h10M9 19h10M4.5 5h.01M4.5 12h.01M4.5 19h.01"/></svg><span>Pedidos</span><i class="dot" id="ordersDot" hidden></i></button>
+                <button type="button" data-tab="products"><svg viewBox="0 0 24 24"><path d="M4 11c0-4 3.6-6 8-6s8 2 8 6v1a2 2 0 0 1-2 2v5H6v-5a2 2 0 0 1-2-2z"/></svg><span>Produtos</span></button>
+                <button type="button" data-tab="categories"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg><span>Categorias</span></button>
+                <button type="button" data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ajustes</span></button>
+            </nav>
+            <button class="btn btn-outline btn-sm a-logout" type="button" id="logout">Sair</button>
+        </div>
+    </header>
+
+    <main class="a-main">
+        <!-- PEDIDOS -->
+        <section class="view" id="v-orders">
+            <div class="v-head">
+                <h1>Pedidos</h1>
+                <button class="btn btn-outline btn-sm" type="button" id="refreshOrders">Atualizar</button>
+            </div>
+            <div class="chips-row" id="orderFilters"></div>
+            <label class="search a-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="orderSearch" placeholder="Buscar por nome, telefone ou nº do pedido"></label>
+            <div id="ordersList" class="list"></div>
+        </section>
+
+        <!-- PRODUTOS -->
+        <section class="view" id="v-products" hidden>
+            <div class="v-head">
+                <h1>Produtos</h1>
+                <button class="btn btn-rose btn-sm" type="button" id="newProduct">+ Novo produto</button>
+            </div>
+            <div class="toolbar">
+                <label class="search a-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="productSearch" placeholder="Buscar produto"></label>
+                <select id="productCatFilter" class="a-select" aria-label="Filtrar por categoria"></select>
+            </div>
+            <p class="tiny muted">Use as setas para mudar a ordem de exibição. Alterações aparecem na loja imediatamente.</p>
+            <div id="productsList" class="list"></div>
+        </section>
+
+        <!-- CATEGORIAS -->
+        <section class="view" id="v-categories" hidden>
+            <div class="v-head">
+                <h1>Categorias</h1>
+                <button class="btn btn-rose btn-sm" type="button" id="newCategory">+ Nova categoria</button>
+            </div>
+            <div id="categoriesList" class="list"></div>
+        </section>
+
+        <!-- CONFIGURAÇÕES -->
+        <section class="view" id="v-settings" hidden>
+            <div class="v-head"><h1>Configurações da loja</h1></div>
+            <form class="form a-form" id="settingsForm" novalidate>
+                <fieldset class="a-card">
+                    <legend>Empresa</legend>
+                    <div class="row2">
+                        <label>Nome da empresa<input name="business_name" maxlength="60"></label>
+                        <label>Frase abaixo do nome<input name="tagline" maxlength="40"></label>
+                    </div>
+                    <div class="img-field" data-field="logo_url" data-size="400" data-thumb="0">
+                        <span class="img-label">Logotipo</span>
+                        <div class="img-prev round"></div>
+                        <div class="img-actions"><label class="btn btn-outline btn-sm">Enviar imagem<input type="file" accept="image/*" hidden></label><button class="btn btn-sm link-btn" type="button" data-img-clear>Remover</button></div>
+                    </div>
+                </fieldset>
+                <fieldset class="a-card">
+                    <legend>Contato e endereço</legend>
+                    <div class="row2">
+                        <label>WhatsApp comercial<input name="whatsapp" type="tel" inputmode="tel" placeholder="(19) 99948-5767"></label>
+                        <label>Instagram<input name="instagram" placeholder="@sabordepao ou link"></label>
+                    </div>
+                    <div class="row2">
+                        <label>Facebook<input name="facebook" placeholder="link da página"></label>
+                        <label>Link do Google Maps<input name="maps_url" placeholder="opcional"></label>
+                    </div>
+                    <div class="row2">
+                        <label>Endereço<input name="address" maxlength="150" placeholder="Rua, número – bairro"></label>
+                        <label>Cidade<input name="city" maxlength="80" placeholder="Cidade – UF"></label>
+                    </div>
+                </fieldset>
+                <fieldset class="a-card">
+                    <legend>Horário de funcionamento</legend>
+                    <div id="hoursEditor" class="hours-ed"></div>
+                    <label>Observação sobre horários<input name="hours_note" maxlength="200" placeholder="Ex.: Encomendas com 1 dia de antecedência"></label>
+                </fieldset>
+                <fieldset class="a-card">
+                    <legend>Retirada (e entrega, se um dia quiser)</legend>
+                    <label class="check"><input type="checkbox" name="pickup_enabled"> Retirada no local</label>
+                    <label>Informações de retirada <span class="muted">(aparece para o cliente)</span><textarea name="pickup_info" rows="2" maxlength="300" placeholder="Ex.: Retirada de segunda a sábado, das 8h às 18h"></textarea></label>
+                    <label class="check"><input type="checkbox" name="delivery_enabled"> Também fazer entrega <span class="muted">(desligado = só retirada)</span></label>
+                    <div class="row2">
+                        <label>Taxa de entrega (R$)<input name="delivery_fee" inputmode="decimal" placeholder="Vazio = a combinar"></label>
+                        <label>Informações de entrega<input name="delivery_info" maxlength="200" placeholder="Ex.: bairros atendidos"></label>
+                    </div>
+                    <label>Informações sobre encomendas (aparece na página inicial)<textarea name="orders_info" rows="2" maxlength="400" placeholder="Ex.: prazo mínimo, como agendar"></textarea></label>
+                </fieldset>
+                <fieldset class="a-card">
+                    <legend>PIX</legend>
+                    <label>Chave PIX<input name="pix_key" maxlength="77" placeholder="Cadastre a chave correta"></label>
+                    <div class="row2">
+                        <label>Titular<input name="pix_holder" maxlength="60"></label>
+                        <label>Cidade do titular <span class="muted">(para o QR Code)</span><input name="pix_city" maxlength="40"></label>
+                    </div>
+                </fieldset>
+                <fieldset class="a-card">
+                    <legend>Página inicial</legend>
+                    <label>Título do banner<input name="hero_title" maxlength="80"></label>
+                    <label>Subtítulo<textarea name="hero_subtitle" rows="2" maxlength="200"></textarea></label>
+                    <label>Texto do botão<input name="hero_cta" maxlength="40"></label>
+                    <div class="img-field" data-field="hero_image" data-size="1800" data-thumb="0">
+                        <span class="img-label">Foto do banner</span>
+                        <div class="img-prev wide"></div>
+                        <div class="img-actions"><label class="btn btn-outline btn-sm">Enviar foto<input type="file" accept="image/*" hidden></label></div>
+                    </div>
+                    <label>Aviso no topo (promoções, recados)<input name="announcement" maxlength="140" placeholder="Vazio = sem aviso"></label>
+                    <div class="row2">
+                        <label>Versículo<input name="verse" maxlength="160"></label>
+                        <label>Referência<input name="verse_ref" maxlength="40"></label>
+                    </div>
+                    <label>Frase do rodapé<input name="quote" maxlength="160"></label>
+                </fieldset>
+                <div class="save-bar"><button class="btn btn-brown btn-block btn-lg" type="submit" id="saveSettings">Salvar configurações</button></div>
+            </form>
+
+            <form class="form a-form a-card" id="passwordForm">
+                <legend>Acesso ao painel</legend>
+                <p class="muted tiny" id="userInfo"></p>
+                <div class="row2">
+                    <label>Nova senha<input name="pw1" type="password" minlength="8" autocomplete="new-password"></label>
+                    <label>Repita a nova senha<input name="pw2" type="password" minlength="8" autocomplete="new-password"></label>
+                </div>
+                <button class="btn btn-outline" type="submit">Alterar senha</button>
+            </form>
+        </section>
+    </main>
+</div>
+
+<!-- ══ EDITOR DE PRODUTO ══ -->
+<div class="overlay" id="mEdit" hidden>
+    <div class="sheet sheet-wide" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+        <button class="x" type="button" data-close aria-label="Fechar">×</button>
+        <form class="form pad" id="productForm" novalidate>
+            <h2 id="editTitle">Produto</h2>
+            <div class="img-field" data-field="image" data-size="1200" data-thumb="480">
+                <span class="img-label">Fotografia</span>
+                <div class="img-prev"></div>
+                <div class="img-actions">
+                    <label class="btn btn-outline btn-sm">Escolher foto<input type="file" accept="image/*" hidden></label>
+                    <button class="btn btn-sm link-btn" type="button" data-img-clear>Remover foto</button>
+                </div>
+                <p class="tiny muted img-info"></p>
+            </div>
+            <label>Nome *<input name="name" required maxlength="120"></label>
+            <div class="row2">
+                <label>Categoria *<select name="category_id" required></select></label>
+                <label>Sabores / destaques <span class="muted">(separe por vírgula)</span><input name="flavors" maxlength="200" placeholder="Frango, Requeijão"></label>
+            </div>
+            <label>Descrição<textarea name="description" rows="3" maxlength="1000"></textarea></label>
+            <fieldset class="a-sub">
+                <legend>Preço</legend>
+                <div class="choices" style="margin-bottom:10px">
+                    <label class="choice"><input type="radio" name="price_mode" value="fixed"><span><b>Preço fixo</b></span></label>
+                    <label class="choice"><input type="radio" name="price_mode" value="quote"><span><b>Sob consulta</b><small>pedido pelo WhatsApp</small></span></label>
+                </div>
+                <div id="fixedBox">
+                    <div class="row2">
+                        <label>Preço (R$) <span class="muted" id="priceHint"></span><input name="price" inputmode="decimal" placeholder="0,00"></label>
+                        <label>Preço promocional (R$)<input name="promo_price" inputmode="decimal" placeholder="Vazio = sem promoção"></label>
+                    </div>
+                </div>
+                <div class="row2">
+                    <label>Unidade de venda<input name="unit" maxlength="30" list="units" placeholder="unidade"></label>
+                    <label>Peso / tamanho<input name="weight_label" maxlength="30" placeholder="Ex.: 700 g, 1 kg"></label>
+                </div>
+                <datalist id="units"><option value="unidade"><option value="kg"><option value="pacote"><option value="dúzia"><option value="fatia"></datalist>
+            </fieldset>
+            <fieldset class="a-sub" id="variantsBox">
+                <legend>Tamanhos, variações ou sabores <span class="muted">(opcional — o cliente escolhe um)</span></legend>
+                <div id="variantsEd" class="rows-ed"></div>
+                <button class="btn btn-outline btn-sm" type="button" id="addVariant">+ Adicionar opção</button>
+            </fieldset>
+            <fieldset class="a-sub" id="addonsBox">
+                <legend>Adicionais <span class="muted">(opcional — o cliente pode marcar vários)</span></legend>
+                <div id="addonsEd" class="rows-ed"></div>
+                <button class="btn btn-outline btn-sm" type="button" id="addAddon">+ Adicionar adicional</button>
+            </fieldset>
+            <fieldset class="a-sub">
+                <legend>Exibição</legend>
+                <label class="check"><input type="checkbox" name="active"> Ativo (aparece na loja)</label>
+                <label class="check"><input type="checkbox" name="featured"> Destaque na página inicial</label>
+                <label>Ordem de exibição<input name="sort_order" type="number" inputmode="numeric" step="1"></label>
+            </fieldset>
+            <p class="form-error" id="editError" hidden></p>
+            <div class="row2 sticky-actions">
+                <button class="btn btn-brown btn-block btn-lg" type="submit" id="saveProduct">Salvar produto</button>
+                <button class="btn btn-outline btn-block" type="button" id="deleteProduct">Excluir produto</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ══ EDITOR DE CATEGORIA ══ -->
+<div class="overlay" id="mCat" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="catTitle">
+        <button class="x" type="button" data-close aria-label="Fechar">×</button>
+        <form class="form pad" id="categoryForm" novalidate>
+            <h2 id="catTitle">Categoria</h2>
+            <label>Nome *<input name="name" required maxlength="80"></label>
+            <label>Descrição<input name="description" maxlength="200"></label>
+            <div class="img-field" data-field="image_url" data-size="900" data-thumb="0">
+                <span class="img-label">Foto da categoria</span>
+                <div class="img-prev"></div>
+                <div class="img-actions"><label class="btn btn-outline btn-sm">Escolher foto<input type="file" accept="image/*" hidden></label><button class="btn btn-sm link-btn" type="button" data-img-clear>Remover</button></div>
+            </div>
+            <label>Ordem<input name="sort_order" type="number" step="1"></label>
+            <label class="check"><input type="checkbox" name="active"> Ativa (aparece na loja)</label>
+            <p class="form-error" id="catError" hidden></p>
+            <div class="row2">
+                <button class="btn btn-brown btn-block" type="submit">Salvar</button>
+                <button class="btn btn-outline btn-block" type="button" id="deleteCategory">Excluir</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ══ DETALHE DO PEDIDO ══ -->
+<div class="overlay" id="mOrder" hidden>
+    <div class="sheet sheet-wide" role="dialog" aria-modal="true" aria-labelledby="odTitle">
+        <button class="x" type="button" data-close aria-label="Fechar">×</button>
+        <div class="pad" id="orderDetail"></div>
+    </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
