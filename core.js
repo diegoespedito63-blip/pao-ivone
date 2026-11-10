@@ -192,7 +192,26 @@
     };
 
     // ── PIX (BR Code estático) ────────────────────────────────
+    const validCPF = d => {
+        if (!/^\d{11}$/.test(d) || /^(\d)\1{10}$/.test(d)) return false;
+        const dv = n => { let s = 0; for (let i = 0; i < n; i++) s += Number(d[i]) * (n + 1 - i); const r = (s * 10) % 11; return r === 10 ? 0 : r; };
+        return dv(9) === Number(d[9]) && dv(10) === Number(d[10]);
+    };
+    /** Normaliza a chave: celular vira +55DDDNÚMERO (exigido pelo PIX); CPF, CNPJ, e-mail e aleatória ficam como estão. */
+    SP.pixKey = key => {
+        const k = String(key || '').trim();
+        if (!k || k.includes('@') || /^[0-9a-f]{8}-/i.test(k)) return k;
+        if (/^\+55\d{10,11}$/.test(k.replace(/[\s()-]/g, ''))) return k.replace(/[\s()-]/g, '');
+        const d = SP.digits(k);
+        if (d.length === 11 && validCPF(d)) return d;                          // CPF
+        if (d.length === 14) return d;                                         // CNPJ
+        if (d.length === 10 || d.length === 11) return '+55' + d;              // celular/telefone
+        if ((d.length === 12 || d.length === 13) && d.startsWith('55')) return '+' + d;
+        return k;
+    };
+    SP.pixKeyLabel = key => { const k = SP.pixKey(key); return /^\+55\d{10,11}$/.test(k) ? `${SP.phoneMask(k.slice(3))} (celular)` : k; };
     SP.pixPayload = (key, name, city, amount) => {
+        key = SP.pixKey(key);
         const clean = s => SP.norm(s).replace(/[^a-z0-9 ]/gi, '').toUpperCase();
         const f = (id, v) => `${id}${String(v.length).padStart(2, '0')}${v}`;
         const gui = f('00', 'br.gov.bcb.pix') + f('01', key.trim());
