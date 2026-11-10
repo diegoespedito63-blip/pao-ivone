@@ -382,12 +382,25 @@
     });
 
     // ── Pedido confirmado ────────────────────────────────────
+    // Chave de celular: no campo "Celular" dos bancos vai só DDD + número (sem +55)
+    const pixIsPhone = k => /^\+55\d{10,11}$/.test(SP.pixKey(k));
+    const pixCopyKey = k => pixIsPhone(k) ? SP.pixKey(k).slice(3) : SP.pixKey(k);
     function showDone(o) {
         const s = settings, msg = SP.orderMessage(o, s);
         let pix = '';
         if (o.payment_method === 'pix') {
             pix = s.pix_key
-                ? `<div class="pix-box"><h3>📲 Pague via PIX</h3><p class="tiny muted">Titular: <b>${esc(s.pix_holder || '')}</b></p><canvas class="pix-qr" id="pixQr" width="190" height="190" aria-label="QR Code PIX"></canvas><p class="tiny muted" style="margin:0">Chave PIX:</p><div class="pix-key">${esc(SP.pixKeyLabel(s.pix_key))}</div><button class="btn btn-outline btn-sm" type="button" id="copyPix">📋 Copiar chave</button> <button class="btn btn-outline btn-sm" type="button" id="copyPixCode">📋 PIX copia e cola</button><p style="margin:10px 0 0">Valor: <b>${money(o.total)}</b></p><p class="tiny muted" style="margin:4px 0 0">Depois de pagar, envie o comprovante no WhatsApp.</p></div>`
+                ? `<div class="pix-box">
+                    <h3>📲 Pague via PIX — ${money(o.total)}</h3>
+                    <p class="tiny muted" style="margin:0 0 10px">Titular: <b>${esc(s.pix_holder || '')}</b>. Escolha <b>uma</b> das formas abaixo:</p>
+                    <div class="pix-opt"><b>1. Ler o QR Code</b><span>No app do banco: <b>Pix → Ler QR Code</b>. O valor já vem preenchido.</span>
+                        <canvas class="pix-qr" id="pixQr" width="190" height="190" aria-label="QR Code PIX"></canvas></div>
+                    <div class="pix-opt"><b>2. Pix Copia e Cola</b><span>Copie o código e cole em <b>Pix → Pix Copia e Cola</b> (não no campo de chave). O valor já vem preenchido.</span>
+                        <button class="btn btn-primary btn-sm btn-block" type="button" id="copyPixCode">📋 Copiar código Pix Copia e Cola</button></div>
+                    <div class="pix-opt"><b>3. Pela chave ${pixIsPhone(s.pix_key) ? '(celular)' : ''}</b><span>Em <b>Pix → Transferir</b>${pixIsPhone(s.pix_key) ? ', escolha <b>Celular</b>' : ''}, cole a chave e digite o valor <b>${money(o.total)}</b>.</span>
+                        <div class="pix-key">${esc(pixCopyKey(s.pix_key))}</div>
+                        <button class="btn btn-outline btn-sm btn-block" type="button" id="copyPix">📋 Copiar chave</button></div>
+                    <p class="tiny muted" style="margin:10px 0 0">Depois de pagar, envie o comprovante no WhatsApp.</p></div>`
                 : `<div class="pix-box"><h3>📲 Pagamento via PIX</h3><p>Titular: <b>${esc(s.pix_holder || '')}</b></p><p class="tiny muted">Enviaremos a chave PIX pelo WhatsApp.</p></div>`;
         }
         $('#doneBody').innerHTML = `<div class="done-check">✓</div><h2 id="doneTitle">Pedido registrado!</h2>
@@ -403,10 +416,10 @@
             <button class="btn btn-outline btn-block" type="button" data-close>Voltar ao cardápio</button>`;
         openM('mDone');
         if (o.payment_method === 'pix' && s.pix_key) {
-            const code = SP.pixPayload(s.pix_key, s.pix_holder, s.pix_city, o.delivery_pending ? 0 : o.total), key = SP.pixKey(s.pix_key);
+            const code = SP.pixPayload(s.pix_key, s.pix_holder, s.pix_city, o.delivery_pending ? 0 : o.total), key = pixCopyKey(s.pix_key);
             drawQR(code);
             const copy = (t, ok) => (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast(ok)).catch(() => prompt('Copie:', t));
-            $('#copyPix').onclick = () => copy(key, 'Chave PIX copiada!');
+            $('#copyPix').onclick = () => copy(key, pixIsPhone(s.pix_key) ? 'Chave copiada! No banco, escolha "Celular" e cole.' : 'Chave PIX copiada!');
             $('#copyPixCode').onclick = () => copy(code, 'PIX copia e cola copiado! Cole no app do banco.');
         }
     }
